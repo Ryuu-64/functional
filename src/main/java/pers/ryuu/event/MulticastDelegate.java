@@ -12,6 +12,10 @@ public abstract class MulticastDelegate<E extends EventListener> {
     protected int index;
 
     public final boolean add(E listener) {
+        int index = delegates.indexOf(listener);
+        if (index <= this.index) {
+            this.index++;
+        }
         return delegates.add(listener);
     }
 
