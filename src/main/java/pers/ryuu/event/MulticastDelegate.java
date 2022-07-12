@@ -12,6 +12,11 @@ public abstract class MulticastDelegate<E extends EventListener> {
     protected int index;
 
     public final boolean add(E listener) {
+        // TODO add null unit test
+        if (listener == null) {
+            return false;
+        }
+
         return delegates.add(listener);
     }
 
