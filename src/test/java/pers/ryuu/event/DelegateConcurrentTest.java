@@ -27,7 +27,7 @@ public class DelegateConcurrentTest {
 
         action.invoke();
 
-        assert res.equals(new ArrayList<>() {
+        assert res.equals(new ArrayList<Integer>() {
             {
                 add(1);
                 add(2);
@@ -40,7 +40,7 @@ public class DelegateConcurrentTest {
 
         res.clear();
         action.invoke();
-        assert res.equals(new ArrayList<>() {
+        assert res.equals(new ArrayList<Integer>() {
             {
                 add(1);
                 add(2);
@@ -72,7 +72,7 @@ public class DelegateConcurrentTest {
 
         action.invoke();
 
-        assert res.equals(new ArrayList<>() {
+        assert res.equals(new ArrayList<Integer>() {
             {
                 add(1);
                 add(2);
@@ -105,7 +105,7 @@ public class DelegateConcurrentTest {
         action.add(test5);
 
         action.invoke();
-        assert res.equals(new ArrayList<>() {
+        assert res.equals(new ArrayList<Integer>() {
             {
                 add(1);
                 add(2);
@@ -142,7 +142,7 @@ public class DelegateConcurrentTest {
         action.add(test1);
 
         action.invoke();
-        assert res.equals(new ArrayList<>() {
+        assert res.equals(new ArrayList<Integer>() {
             {
                 add(1);
                 add(1);
@@ -176,7 +176,7 @@ public class DelegateConcurrentTest {
         action.invoke();
 
         System.out.println(res);
-        assert res.equals(new ArrayList<>() {
+        assert res.equals(new ArrayList<Integer>() {
             {
                 add(1);
                 add(2);
@@ -210,7 +210,7 @@ public class DelegateConcurrentTest {
         action.invoke();
 
         System.out.println(res);
-        assert res.equals(new ArrayList<>() {
+        assert res.equals(new ArrayList<Integer>() {
             {
                 add(1);
                 add(2);
