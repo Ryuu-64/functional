@@ -1,4 +1,4 @@
-package pers.ryuu.event;
+package pers.ryuu.delegate;
 
 import org.junit.jupiter.api.Test;
 

@@ -1,4 +1,4 @@
-package pers.ryuu.event;
+package pers.ryuu.delegate;
 
 
 public class Func2Arg<T1, T2, TResult> extends MulticastDelegate<IFunc2Arg<T1, T2, TResult>> {

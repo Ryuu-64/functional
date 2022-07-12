@@ -1,4 +1,4 @@
-package pers.ryuu.event;
+package pers.ryuu.delegate;
 
 public final class Action extends MulticastDelegate<IAction> {
 
