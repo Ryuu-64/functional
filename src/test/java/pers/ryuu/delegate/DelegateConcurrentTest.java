@@ -16,7 +16,7 @@ public class DelegateConcurrentTest {
         IAction test3 = () -> res.add(3);
         IAction test4 = () -> res.add(4);
         IAction test5 = () -> res.add(5);
-        IAction removeTest3 = () -> System.out.println(action.remove(test3));
+        IAction removeTest3 = () -> action.remove(test3);
 
         action.add(test1);
         action.add(test2);
@@ -61,7 +61,7 @@ public class DelegateConcurrentTest {
         IAction test3 = () -> res.add(3);
         IAction test4 = () -> res.add(4);
         IAction test5 = () -> res.add(5);
-        IAction removeTest3 = () -> System.out.println(action.remove(test3));
+        IAction removeTest3 = () -> action.remove(test3);
 
         action.add(test1);
         action.add(test2);
@@ -93,7 +93,7 @@ public class DelegateConcurrentTest {
         IAction test3 = () -> res.add(3);
         IAction test4 = () -> res.add(4);
         IAction test5 = () -> res.add(5);
-        IAction removeTest3 = () -> System.out.println(action.remove(test3));
+        IAction removeTest3 = () -> action.remove(test3);
 
         action.add(test1);
         action.add(test2);
@@ -120,13 +120,20 @@ public class DelegateConcurrentTest {
     @Test
     void removeReturnValue() {
         Action action = new Action();
-        IAction test1 = () -> System.out.println(1);
+        IAction test1 = () -> System.out.println("remove return value test");
 
         action.add(test1);
         boolean removeResult1 = action.remove(test1);
         boolean removeResult2 = action.remove(test1);
         assert removeResult1;
         assert !removeResult2;
+    }
+
+    @Test
+    void removeNull() {
+        Action action = new Action();
+        boolean removeNullResult = action.remove(null);
+        assert !removeNullResult;
     }
 
     @Test
@@ -164,7 +171,7 @@ public class DelegateConcurrentTest {
         IAction test3 = () -> res.add(3);
         IAction test4 = () -> res.add(4);
         IAction test5 = () -> res.add(5);
-        IAction addTest3 = () -> System.out.println(action.add(test3));
+        IAction addTest3 = () -> action.add(test3);
 
         action.add(test1);
         action.add(test2);
@@ -198,7 +205,7 @@ public class DelegateConcurrentTest {
         IAction test3 = () -> res.add(3);
         IAction test4 = () -> res.add(4);
         IAction test5 = () -> res.add(5);
-        IAction addTest3 = () -> System.out.println(action.add(test3));
+        IAction addTest3 = () -> action.add(test3);
 
         action.add(test1);
         action.add(test2);
@@ -220,5 +227,13 @@ public class DelegateConcurrentTest {
                 add(3);
             }
         });
+    }
+
+    @Test
+    void addNull() {
+        Action action = new Action();
+        boolean addNullResult = action.add(null);
+        assert !addNullResult;
+        assert action.count() == 0;
     }
 }
