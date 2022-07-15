@@ -1,4 +1,4 @@
-package pers.ryuu.delegate;
+package pers.ryuu.functional_interface;
 
 public class Func<TResult> extends MulticastDelegate<IFunc<TResult>> {
 

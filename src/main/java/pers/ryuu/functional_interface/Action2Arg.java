@@ -1,4 +1,4 @@
-package pers.ryuu.delegate;
+package pers.ryuu.functional_interface;
 
 
 public final class Action2Arg<T1, T2> extends MulticastDelegate<IAction2Arg<T1, T2>> {
