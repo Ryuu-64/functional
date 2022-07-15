@@ -229,6 +229,7 @@ public class DelegateConcurrentTest {
         });
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Test
     void addNull() {
         Action action = new Action();
