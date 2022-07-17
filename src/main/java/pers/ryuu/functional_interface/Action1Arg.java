@@ -1,10 +1,10 @@
 package pers.ryuu.functional_interface;
 
-public final class Action1Arg<T> extends MulticastDelegate<IAction1Arg<T>> {
+public final class Action1Arg<T> extends MulticastFunctionalInterface<IAction1Arg<T>> {
 
     public void invoke(T arg1) {
-        for (index = 0; index < delegates.size(); index++) {
-            delegates.get(index).invoke(arg1);
+        for (index = 0; index < interfaces.size(); index++) {
+            interfaces.get(index).invoke(arg1);
         }
     }
 }
