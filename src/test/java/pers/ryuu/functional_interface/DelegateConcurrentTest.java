@@ -7,6 +7,26 @@ import java.util.ArrayList;
 public class DelegateConcurrentTest {
 
     @Test
+    void addMulticast() {
+        Action1Arg<Integer> action1 = new Action1Arg<>();
+        action1.add(System.out::println);
+        action1.add(($int) -> System.out.println($int + 1));
+        action1.add(($int) -> System.out.println($int + 2));
+        action1.invoke(0);
+        System.out.println();
+
+        Action1Arg<Integer> action2 = new Action1Arg<>();
+        action2.add(System.out::println);
+        action2.add(($int) -> System.out.println($int + 1));
+        action2.add(($int) -> System.out.println($int + 2));
+        action2.invoke(0);
+        System.out.println();
+
+        action1.add(action2);
+        action1.invoke(0);
+    }
+
+    @Test
     void removeAfterTargetInvoke() {
         ArrayList<Integer> res = new ArrayList<>();
 
@@ -233,7 +253,7 @@ public class DelegateConcurrentTest {
     @Test
     void addNull() {
         Action action = new Action();
-        boolean addNullResult = action.add(null);
+        boolean addNullResult = action.add((IAction) null);
         assert !addNullResult;
         assert action.count() == 0;
     }

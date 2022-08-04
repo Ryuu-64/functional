@@ -1,25 +1,26 @@
 package pers.ryuu.functional_interface;
 
 import java.util.ArrayList;
-import java.util.EventListener;
-import java.util.HashSet;
 import java.util.List;
 
-public abstract class MulticastFunctionalInterface<E extends EventListener> {
+public abstract class MulticastFunctionalInterface<T extends IFunctionalInterface> {
 
-    protected final List<E> interfaces = new ArrayList<>();
+    protected final List<T> interfaces = new ArrayList<>();
 
     protected int index;
 
-    public final boolean add(E listener) {
+    @SuppressWarnings("unchecked")
+    public final boolean add(T listener) {
         if (listener == null) {
             return false;
+        } else if (listener instanceof MulticastFunctionalInterface) {
+            return addMulticast((MulticastFunctionalInterface<T>) listener);
+        } else /* if (listener instanceof IFunctionalInterface) */ {
+            return addUnicast(listener);
         }
-
-        return interfaces.add(listener);
     }
 
-    public final boolean remove(E listener) {
+    public final boolean remove(T listener) {
         int index = interfaces.indexOf(listener);
         if (index == -1) {
             return false;
@@ -31,15 +32,8 @@ public abstract class MulticastFunctionalInterface<E extends EventListener> {
         }
     }
 
-    public final boolean contains(E listener) {
+    public final boolean contains(T listener) {
         return interfaces.contains(listener);
-    }
-
-    public final boolean contains(MulticastFunctionalInterface<E> multicastFunctionalInterface) {
-        if (multicastFunctionalInterface == null) {
-            return false;
-        }
-        return new HashSet<>(this.interfaces).containsAll(multicastFunctionalInterface.interfaces);
     }
 
     public final void clear() {
@@ -48,5 +42,17 @@ public abstract class MulticastFunctionalInterface<E extends EventListener> {
 
     public final int count() {
         return interfaces.size();
+    }
+
+    private boolean addUnicast(T listener) {
+        return interfaces.add(listener);
+    }
+
+    private boolean addMulticast(MulticastFunctionalInterface<T> listener) {
+        boolean res = false;
+        for (T t : listener.interfaces) {
+            add(t);
+        }
+        return res;
     }
 }
