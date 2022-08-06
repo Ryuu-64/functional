@@ -1,4 +1,4 @@
-# Functional-Interface
+# Functional
 
 ## 这是什么？
 
