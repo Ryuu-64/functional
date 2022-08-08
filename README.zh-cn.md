@@ -1,5 +1,7 @@
 # Functional
 
+[![](https://jitpack.io/v/Ryuu-64/Functional.svg)](https://jitpack.io/#Ryuu-64/Functional)
+
 ## 这是什么？
 
 预定义常用的泛型函数式接口。
