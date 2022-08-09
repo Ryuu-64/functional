@@ -112,4 +112,28 @@ public class FunctionalTest {
         action.invoke();
         assert stringBuilder.toString().equals("01234");
     }
+
+    @Test
+    void containsNull() {
+        // TODO
+    }
+
+    @Test
+    void containsMulticast() {
+        // TODO
+    }
+
+    @SuppressWarnings("MismatchedQueryAndUpdateOfStringBuilder")
+    @Test
+    void clear() {
+        StringBuilder stringBuilder = new StringBuilder();
+        Action1Arg<Integer> action = new Action1Arg<>();
+        action.add(stringBuilder::append);
+        action.add(($int) -> stringBuilder.append($int + 1));
+        action.add(($int) -> action.clear());
+        action.add(($int) -> stringBuilder.append($int + 2));
+        action.invoke(0);
+        assert stringBuilder.toString().equals("01");
+        stringBuilder.delete(0, stringBuilder.length());
+    }
 }

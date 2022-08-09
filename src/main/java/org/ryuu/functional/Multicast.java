@@ -6,7 +6,7 @@ import java.util.List;
 public class Multicast<T extends Unicast> implements Unicast, Iterable<T> {
 
     public class Iterator implements java.util.Iterator<T> {
-        public int cursor;
+        private int cursor;
 
         @Override
         public boolean hasNext() {
@@ -57,12 +57,20 @@ public class Multicast<T extends Unicast> implements Unicast, Iterable<T> {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public final boolean contains(T functional) {
-        return unicastList.contains(functional);
+        if (functional == null) {
+            return false;
+        } else if (functional instanceof Multicast) {
+            return containsMulticast((Multicast<T>) functional);
+        } else /* if (functional instanceof Unicast) */ {
+            return containsUnicast(functional);
+        }
     }
 
     public final void clear() {
         unicastList.clear();
+        iterator.reset();
     }
 
     public final int count() {
@@ -98,12 +106,29 @@ public class Multicast<T extends Unicast> implements Unicast, Iterable<T> {
     }
 
     private boolean removeMulticast(Multicast<T> multicast) {
-        int subtrahendCount = count();
-        int minuendCount = multicast.count();
+        int sourceCount = count();
+        int targetCount = multicast.count();
 
-        for (int i = subtrahendCount - minuendCount; i >= 0; i--) {
-            if (equal(multicast.unicastList, i, minuendCount)) {
-                delete(unicastList, i, minuendCount);
+        for (int i = sourceCount - targetCount; i >= 0; i--) {
+            if (equal(multicast.unicastList, i, targetCount)) {
+                delete(unicastList, i, targetCount);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean containsUnicast(T unicast) {
+        return unicastList.contains(unicast);
+    }
+
+    private boolean containsMulticast(Multicast<T> multicast) {
+        int sourceCount = count();
+        int targetCount = multicast.count();
+
+        for (int i = sourceCount - targetCount; i >= 0; i--) {
+            if (equal(multicast.unicastList, i, targetCount)) {
                 return true;
             }
         }
