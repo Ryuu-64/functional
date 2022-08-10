@@ -113,9 +113,11 @@ public class FunctionalTest {
         assert stringBuilder.toString().equals("01234");
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Test
     void containsNull() {
-        // TODO
+        Action action = new Action();
+        assert !action.contains(null);
     }
 
     @Test
