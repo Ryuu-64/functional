@@ -3,9 +3,9 @@ package org.ryuu.functional;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Multicast<T extends Unicast> implements Unicast, Iterable<T> {
+public class Multicast<F extends Unicast> implements Unicast, Iterable<F> {
 
-    public class Iterator implements java.util.Iterator<T> {
+    public class Iterator implements java.util.Iterator<F> {
         private int cursor;
 
         @Override
@@ -14,8 +14,8 @@ public class Multicast<T extends Unicast> implements Unicast, Iterable<T> {
         }
 
         @Override
-        public T next() {
-            T next = unicastList.get(cursor);
+        public F next() {
+            F next = unicastList.get(cursor);
             cursor++;
             return next;
         }
@@ -25,44 +25,44 @@ public class Multicast<T extends Unicast> implements Unicast, Iterable<T> {
         }
     }
 
-    protected final List<T> unicastList = new ArrayList<>();
+    protected final List<F> unicastList = new ArrayList<>();
 
     protected Iterator iterator = new Iterator();
 
     @Override
-    public java.util.Iterator<T> iterator() {
+    public java.util.Iterator<F> iterator() {
         iterator.reset();
         return iterator;
     }
 
     @SuppressWarnings("unchecked")
-    public final boolean add(T functional) {
+    public final boolean add(F functional) {
         if (functional == null) {
             return false;
         } else if (functional instanceof Multicast) {
-            return addMulticast((Multicast<T>) functional);
+            return addMulticast((Multicast<F>) functional);
         } else /* if (functional instanceof Unicast) */ {
             return addUnicast(functional);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public final boolean remove(T functional) {
+    public final boolean remove(F functional) {
         if (functional == null) {
             return false;
         } else if (functional instanceof Multicast) {
-            return removeMulticast((Multicast<T>) functional);
+            return removeMulticast((Multicast<F>) functional);
         } else /* if (functional instanceof Unicast) */ {
             return removeUnicast(functional);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public final boolean contains(T functional) {
+    public final boolean contains(F functional) {
         if (functional == null) {
             return false;
         } else if (functional instanceof Multicast) {
-            return containsMulticast((Multicast<T>) functional);
+            return containsMulticast((Multicast<F>) functional);
         } else /* if (functional instanceof Unicast) */ {
             return containsUnicast(functional);
         }
@@ -77,23 +77,23 @@ public class Multicast<T extends Unicast> implements Unicast, Iterable<T> {
         return unicastList.size();
     }
 
-    public List<T> getUnicastList() {
+    public List<F> getUnicastList() {
         return new ArrayList<>(unicastList);
     }
 
-    private boolean addUnicast(T unicast) {
+    private boolean addUnicast(F unicast) {
         return unicastList.add(unicast);
     }
 
-    private boolean addMulticast(Multicast<T> multicast) {
+    private boolean addMulticast(Multicast<F> multicast) {
         boolean isAdd = false;
-        for (T unicast : multicast.unicastList) {
+        for (F unicast : multicast.unicastList) {
             isAdd = addUnicast(unicast);
         }
         return isAdd;
     }
 
-    private boolean removeUnicast(T unicast) {
+    private boolean removeUnicast(F unicast) {
         int index = unicastList.indexOf(unicast);
         if (index == -1) {
             return false;
@@ -105,7 +105,7 @@ public class Multicast<T extends Unicast> implements Unicast, Iterable<T> {
         }
     }
 
-    private boolean removeMulticast(Multicast<T> multicast) {
+    private boolean removeMulticast(Multicast<F> multicast) {
         int sourceCount = count();
         int targetCount = multicast.count();
 
@@ -119,11 +119,11 @@ public class Multicast<T extends Unicast> implements Unicast, Iterable<T> {
         return false;
     }
 
-    private boolean containsUnicast(T unicast) {
+    private boolean containsUnicast(F unicast) {
         return unicastList.contains(unicast);
     }
 
-    private boolean containsMulticast(Multicast<T> multicast) {
+    private boolean containsMulticast(Multicast<F> multicast) {
         int sourceCount = count();
         int targetCount = multicast.count();
 
@@ -136,7 +136,7 @@ public class Multicast<T extends Unicast> implements Unicast, Iterable<T> {
         return false;
     }
 
-    private boolean equal(List<T> unicastList, int start, int count) {
+    private boolean equal(List<F> unicastList, int start, int count) {
         for (int i = 0; i < count; i++) {
             if (!this.unicastList.get(i + start).equals(unicastList.get(i))) {
                 return false;
@@ -145,7 +145,7 @@ public class Multicast<T extends Unicast> implements Unicast, Iterable<T> {
         return true;
     }
 
-    private void delete(List<T> unicastList, int start, int count) {
+    private void delete(List<F> unicastList, int start, int count) {
         for (int i = 0; i < count; i++) {
             unicastList.remove(start);
         }

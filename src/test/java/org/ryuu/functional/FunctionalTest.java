@@ -161,4 +161,15 @@ public class FunctionalTest {
         assert stringBuilder.toString().equals("01");
         stringBuilder.delete(0, stringBuilder.length());
     }
+
+    @SuppressWarnings("Convert2MethodRef")
+    @Test
+    void generic() {
+        Action1Arg<Object> action1 = new Action1Arg<>();
+//        action1.add((Float $float) -> System.out.println($float));
+        Action1Arg<Object> action2 = new Action1Arg<>();
+        action2.add((Object object) -> System.out.println(object));
+        assert action1.add(action2);
+//        action1.add(new Action1Arg<Float>());
+    }
 }
