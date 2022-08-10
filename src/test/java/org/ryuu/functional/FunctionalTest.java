@@ -122,7 +122,30 @@ public class FunctionalTest {
 
     @Test
     void containsMulticast() {
-        // TODO
+        Action action1 = new Action();
+        Action action2 = new Action();
+
+        IAction iAction0 = () -> System.out.println(0);
+        IAction iAction1 = () -> System.out.println(1);
+        IAction iAction2 = () -> System.out.println(2);
+        IAction iAction3 = () -> System.out.println(3);
+        IAction iAction4 = () -> System.out.println(4);
+
+        action1.add(iAction0);
+        action1.add(iAction1);
+        action1.add(iAction2);
+        action1.add(iAction3);
+        action1.add(iAction4);
+
+        action2.add(iAction2);
+        action2.add(iAction3);
+        action2.add(iAction4);
+
+        assert action1.contains(action2);
+
+        action2.add(iAction4);
+
+        assert !action1.contains(action2);
     }
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfStringBuilder")
