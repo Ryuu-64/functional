@@ -1,6 +1,6 @@
 package org.ryuu.functional;
 
-public class Func5Arg<T1, T2, T3, T4, T5, TResult>
+public final class Func5Arg<T1, T2, T3, T4, T5, TResult>
         extends Multicast<IFunc5Arg<T1, T2, T3, T4, T5, TResult>>
         implements IFunc5Arg<T1, T2, T3, T4, T5, TResult> {
     @Override

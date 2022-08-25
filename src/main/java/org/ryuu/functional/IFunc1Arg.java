@@ -1,6 +1,6 @@
 package org.ryuu.functional;
 
 @FunctionalInterface
-public interface IFunc1Arg<T1, TResult> extends Unicast {
-    TResult invoke(T1 arg1);
+public interface IFunc1Arg<T, TResult> extends Unicast {
+    TResult invoke(T arg);
 }

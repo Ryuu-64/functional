@@ -3,7 +3,7 @@ package org.ryuu.functional;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Multicast<F extends Unicast> implements Unicast, Iterable<F> {
+public abstract class Multicast<F extends Unicast> implements Unicast, Iterable<F> {
 
     public class Iterator implements java.util.Iterator<F> {
         private int cursor;

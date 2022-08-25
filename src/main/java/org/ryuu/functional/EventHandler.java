@@ -1,6 +1,6 @@
 package org.ryuu.functional;
 
-public class EventHandler<TSender, TEventArgs extends EventArgs>
+public final class EventHandler<TSender, TEventArgs extends EventArgs>
         extends Multicast<IEventHandler<TSender, TEventArgs>>
         implements IEventHandler<TSender, TEventArgs> {
     @Override

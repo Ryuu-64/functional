@@ -1,6 +1,6 @@
 package org.ryuu.functional;
 
-public class Func<TResult>
+public final class Func<TResult>
         extends Multicast<IFunc<TResult>>
         implements IFunc<TResult> {
     @Override
