@@ -5,6 +5,21 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 public class FunctionalTest {
+    @Test
+    void addGenericCheck() {
+        Action1Arg<Integer> action1 = new Action1Arg<>();
+//        action1.add(new IAction1Arg<Double>() {
+//            @Override
+//            public void invoke(Double $double) {
+//                System.out.println($double);
+//            }
+//        });
+//        action1.add((Double $double) -> {
+//            System.out.println($double);
+//        });
+        Action1Arg<Double> action2 = new Action1Arg<>();
+//        action1.add(action2);
+    }
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfStringBuilder")
     @Test
@@ -171,5 +186,40 @@ public class FunctionalTest {
         action2.add((Object object) -> System.out.println(object));
         assert action1.add(action2);
 //        action1.add(new Action1Arg<Float>());
+    }
+
+    @SuppressWarnings("UnnecessaryBoxing")
+    @Test
+    void contravariant() {
+        Action1Arg<Number> action = new Action1Arg<>();
+        action.add(System.out::println);
+        action.invoke(new Double(1));
+    }
+
+    @Test
+    void covariant() {
+        Action1Arg<Double> action = new Action1Arg<>();
+        action.add(System.out::println);
+//        action.invoke(new Number() {
+//            @Override
+//            public int intValue() {
+//                return 0;
+//            }
+//
+//            @Override
+//            public long longValue() {
+//                return 0;
+//            }
+//
+//            @Override
+//            public float floatValue() {
+//                return 0;
+//            }
+//
+//            @Override
+//            public double doubleValue() {
+//                return 0;
+//            }
+//        });
     }
 }
