@@ -1,4 +1,4 @@
 package org.ryuu.functional;
 
-public interface Unicast extends Functional {
+interface Unicast extends Functional {
 }

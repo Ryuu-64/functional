@@ -193,7 +193,7 @@ public class FunctionalTest {
     void contravariant() {
         Action1Arg<Number> action = new Action1Arg<>();
         action.add(System.out::println);
-        action.invoke(new Double(1));
+        action.invoke(Double.valueOf(1));
     }
 
     @Test

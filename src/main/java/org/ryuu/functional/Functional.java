@@ -2,5 +2,5 @@ package org.ryuu.functional;
 
 import java.util.EventListener;
 
-public interface Functional extends EventListener {
+interface Functional extends EventListener {
 }
