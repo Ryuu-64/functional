@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 public class FunctionalTest {
+    private FunctionalTest() {
+    }
+
     @Test
     void addGenericCheck() {
         Action1Arg<Integer> action1 = new Action1Arg<>();
