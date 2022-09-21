@@ -4,7 +4,7 @@ public final class Action
         extends Multicast<IAction>
         implements IAction {
     @Override
-    public void invoke() {
+    public synchronized void invoke() {
         for (IAction functional : this) {
             functional.invoke();
         }

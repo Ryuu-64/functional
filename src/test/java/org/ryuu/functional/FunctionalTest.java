@@ -11,15 +11,8 @@ public class FunctionalTest {
     @Test
     void addGenericCheck() {
         Action1Arg<Integer> action1 = new Action1Arg<>();
-//        action1.add(new IAction1Arg<Double>() {
-//            @Override
-//            public void invoke(Double $double) {
-//                System.out.println($double);
-//            }
-//        });
-//        action1.add((Double $double) -> {
-//            System.out.println($double);
-//        });
+//        action1.add((IAction1Arg<Double>) (Double $double) -> System.out.println($double));
+//        action1.add((Double $double) -> System.out.println($double));
         Action1Arg<Double> action2 = new Action1Arg<>();
 //        action1.add(action2);
     }
@@ -224,5 +217,26 @@ public class FunctionalTest {
 //                return 0;
 //            }
 //        });
+    }
+
+    @Test
+    void multiThread() {
+        Action action = new Action();
+        action.add(() -> System.out.println(1));
+        action.add(() -> System.out.println(2));
+        action.add(() -> System.out.println(3));
+        action.add(() -> System.out.println(4));
+        action.add(() -> System.out.println(5));
+        action.add(System.out::println);
+        new Thread(() -> {
+            while (true) {
+                action.invoke();
+            }
+        }).start();
+        new Thread(() -> {
+            while (true) {
+                action.invoke();
+            }
+        }).start();
     }
 }
