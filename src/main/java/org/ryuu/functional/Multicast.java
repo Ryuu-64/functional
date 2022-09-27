@@ -20,7 +20,7 @@ abstract class Multicast<F extends Unicast> implements Unicast, Iterable<F> {
             return next;
         }
 
-        public void reset() {
+        private void reset() {
             cursor = 0;
         }
     }

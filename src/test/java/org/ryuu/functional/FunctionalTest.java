@@ -221,22 +221,26 @@ public class FunctionalTest {
 
     @Test
     void multiThread() {
+        final String[] result = {""};
         Action action = new Action();
-        action.add(() -> System.out.println(1));
-        action.add(() -> System.out.println(2));
-        action.add(() -> System.out.println(3));
-        action.add(() -> System.out.println(4));
-        action.add(() -> System.out.println(5));
-        action.add(System.out::println);
-        new Thread(() -> {
-            while (true) {
-                action.invoke();
-            }
-        }).start();
-        new Thread(() -> {
-            while (true) {
-                action.invoke();
-            }
-        }).start();
+        action.add(() -> result[0] += "1");
+        action.add(() -> result[0] += "2");
+        action.add(() -> result[0] += "3");
+        action.add(() -> result[0] += "4");
+        action.add(() -> result[0] += "5");
+        action.add(() -> {
+            System.out.println(result[0]);
+            assert result[0].equals("12345");
+            result[0] = "";
+        });
+
+        for (int i = 0; i < 16; i++) {
+            new Thread(() -> {
+                while (true) {
+                    action.invoke();
+                }
+            }).start();
+
+        }
     }
 }
