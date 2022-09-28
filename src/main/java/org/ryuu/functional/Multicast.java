@@ -4,27 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 abstract class Multicast<F extends Unicast> implements Unicast, Iterable<F> {
-
-    private class Iterator implements java.util.Iterator<F> {
-        private int cursor;
-
-        @Override
-        public boolean hasNext() {
-            return this.cursor != unicastList.size();
-        }
-
-        @Override
-        public F next() {
-            F next = unicastList.get(cursor);
-            cursor++;
-            return next;
-        }
-
-        private void reset() {
-            cursor = 0;
-        }
-    }
-
     protected final List<F> unicastList = new ArrayList<>();
 
     protected Iterator iterator = new Iterator();
@@ -148,6 +127,26 @@ abstract class Multicast<F extends Unicast> implements Unicast, Iterable<F> {
     private void delete(List<F> unicastList, int start, int count) {
         for (int i = 0; i < count; i++) {
             unicastList.remove(start);
+        }
+    }
+
+    private class Iterator implements java.util.Iterator<F> {
+        private int cursor;
+
+        @Override
+        public boolean hasNext() {
+            return this.cursor != unicastList.size();
+        }
+
+        @Override
+        public F next() {
+            F next = unicastList.get(cursor);
+            cursor++;
+            return next;
+        }
+
+        private void reset() {
+            cursor = 0;
         }
     }
 }
