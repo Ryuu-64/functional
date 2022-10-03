@@ -2,17 +2,11 @@ package org.ryuu.functional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 abstract class Multicast<F extends Unicast> implements Unicast, Iterable<F> {
     protected final List<F> unicastList = new ArrayList<>();
-
-    protected Iterator iterator = new Iterator();
-
-    @Override
-    public java.util.Iterator<F> iterator() {
-        iterator.reset();
-        return iterator;
-    }
+    protected Iterator<F> iterator = new Iterator<>(this);
 
     @SuppressWarnings("unchecked")
     public final boolean add(F functional) {
@@ -130,23 +124,64 @@ abstract class Multicast<F extends Unicast> implements Unicast, Iterable<F> {
         }
     }
 
-    private class Iterator implements java.util.Iterator<F> {
+    @Override
+    public java.util.Iterator<F> iterator() {
+        iterator.reset();
+        return iterator;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Multicast<?> multicast = (Multicast<?>) obj;
+        return unicastList.equals(multicast.unicastList) && iterator.equals(multicast.iterator);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(unicastList, iterator);
+    }
+
+    private static class Iterator<E extends Unicast> implements java.util.Iterator<E> {
+        private final Multicast<E> multicast;
         private int cursor;
 
-        @Override
-        public boolean hasNext() {
-            return this.cursor != unicastList.size();
-        }
-
-        @Override
-        public F next() {
-            F next = unicastList.get(cursor);
-            cursor++;
-            return next;
+        private Iterator(Multicast<E> multicast) {
+            this.multicast = multicast;
         }
 
         private void reset() {
             cursor = 0;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return this.cursor != multicast.unicastList.size();
+        }
+
+        @Override
+        public E next() {
+            E next = multicast.unicastList.get(cursor);
+            cursor++;
+            return next;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Iterator<?> that = (Iterator<?>) o;
+            return cursor == that.cursor;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(cursor);
         }
     }
 }

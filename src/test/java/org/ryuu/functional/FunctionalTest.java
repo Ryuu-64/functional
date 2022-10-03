@@ -243,4 +243,36 @@ public class FunctionalTest {
 
         }
     }
+
+    @Test
+    void equals() {
+        IAction println1 = () -> System.out.println(1);
+        IAction println2 = () -> System.out.println(2);
+        Action action1 = new Action();
+        Action action2 = new Action();
+        action1.add(println1);
+        action1.add(println2);
+        action2.add(println1);
+        action2.add(println2);
+        assert action1.equals(action2);
+        assert action2.equals(action1);
+        action1.add(println1);
+        assert !action1.equals(action2);
+        assert !action2.equals(action1);
+    }
+
+    @Test
+    void hashCodeTest() {
+        IAction println1 = () -> System.out.println(1);
+        IAction println2 = () -> System.out.println(2);
+        Action action1 = new Action();
+        Action action2 = new Action();
+        action1.add(println1);
+        action1.add(println2);
+        action2.add(println1);
+        action2.add(println2);
+        assert action1.hashCode() == action2.hashCode();
+        action1.add(println1);
+        assert action1.hashCode() != action2.hashCode();
+    }
 }
