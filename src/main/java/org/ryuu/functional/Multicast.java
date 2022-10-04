@@ -135,7 +135,7 @@ abstract class Multicast<F extends Unicast> implements Unicast, Iterable<F> {
         if (this == obj) {
             return true;
         }
-        if (obj == null || getClass() != obj.getClass()) {
+        if (!(obj instanceof Multicast<?>)) {
             return false;
         }
         Multicast<?> multicast = (Multicast<?>) obj;
@@ -172,10 +172,14 @@ abstract class Multicast<F extends Unicast> implements Unicast, Iterable<F> {
         }
 
         @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Iterator<?> that = (Iterator<?>) o;
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!(obj instanceof Iterator<?>)) {
+                return false;
+            }
+            Iterator<?> that = (Iterator<?>) obj;
             return cursor == that.cursor;
         }
 
