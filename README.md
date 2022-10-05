@@ -8,21 +8,21 @@
 
 1. Predefined generic functional interface[^1]:
 
-   1. No parameters up to 8 parameters **no return value** [IAction](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/ IAction.java) ~ [IAction8Arg](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/IAction8Arg.java)
+   1. No parameters up to 8 parameters **no return value** [IAction](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/IAction.java) ~ [IAction8Arg](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/IAction8Arg.java)
 
-   2. No parameters to up to 8 parameters **with return value** [IFunc](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/ IFunc.java) ~ [IFunc8Arg](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/IFunc8Arg.java)
+   2. No parameters to up to 8 parameters **with return value** [IFunc](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/IFunc.java) ~ [IFunc8Arg](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/IFunc8Arg.java)
 
    3. [IEventHandler](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/IEventHandler.java)[^2]
 
 2. Multicast generic functional interface[^3]:
 
-   1. No parameters to up to 8 parameters **no return value** [Action](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/ Action.java) ~ [Action8Arg](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/Action8Arg.java)
+   1. No parameters to up to 8 parameters **no return value** [Action](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/Action.java) ~ [Action8Arg](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/Action8Arg.java)
 
-   2. No parameters to up to 8 parameters **with return value** [Func](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/ Func.java) ~ [Func8Arg](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/Func8Arg.java)
+   2. No parameters to up to 8 parameters **with return value** [Func](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/Func.java) ~ [Func8Arg](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/Func8Arg.java)
 
    3. [EventHandler](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/EventHandler.java)
 
-   The multicast generic functional interface is the encapsulation of a set of predefined generic functional interfaces. Calling the invoke[^4] of the multicast functional interface will call the invoke of all functional interfaces in the set in turn. It supports [added](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/Multicast.java#L12), [removed](https:/ /github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/Multicast.java#L23), [contains](https://github.com/Ryuu-64/ Functional/blob/main/src/main/java/org/ryuu/functional/Multicast.java#L34)[^5], [equals](https://github.com/Ryuu-64/Functional/blob/main /src/main/java/org/ryuu/functional/Multicast.java#L134) and [hashCode](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ ryuu/functional/Multicast.java#L146) operation, supports adding and modifying operations during invoke, multi-thread safety.
+   The multicast generic functional interface is the encapsulation of a set of predefined generic functional interfaces. Calling the invoke[^4] of the multicast functional interface will call the invoke of all functional interfaces in the set in turn. It supports [added](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/Multicast.java#L12), [removed](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/Multicast.java#L23), [contains](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/Multicast.java#L34)[^5], [equals](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/Multicast.java#L134) and [hashCode](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/Multicast.java#L146) operation, supports adding and modifying operations during invoke, multi-thread safety.
 
 
 ## Why use?
@@ -58,9 +58,9 @@ If you find any bugs or have any suggestions, please contact [me (ryuu)](64ryuu@
 
 ## Footnotes
 
-[^1]: C# generics are reified generics, which can define classes with the same interface name but different generic parameters. Java generics are non-reified generics, classes with the same interface name but different generic parameters cannot be defined. For details, see [Type erasure versus reified generics](https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java#Type_erasure_versus_reified_generics)<br>[Functional programming like Java Lambda expressions in .NET](https: //en.wikipedia.org/wiki/Functional_programming) implementation is called [delegate](https://docs.microsoft.com/en-us/dotnet/csharp/delegate-class). Unlike Java functional interfaces, delegates in .NET default to multicast delegates, and .NET declares a variety of generic delegates ranging from no parameters to 16 parameters, from no return value to return value. Therefore, developers can use .NET's declared delegates instead of declaring their own. For details, see [CSharp-Delegate](https://blog.ryuu64.top/CSharp-%E5%A7%94%E6%89%98/), [Functional programming](https://en.wikipedia.org/ wiki/Comparison_of_C_Sharp_and_Java#Functional_programming).
+[^1]: C# generics are reified generics, which can define classes with the same interface name but different generic parameters. Java generics are non-reified generics, classes with the same interface name but different generic parameters cannot be defined. For details, see [Type erasure versus reified generics](https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java#Type_erasure_versus_reified_generics)<br>[Functional programming](https://en.wikipedia.org/wiki/Functional_programming) like Java Lambda expressions in .NET implementation is called [delegate](https://docs.microsoft.com/en-us/dotnet/csharp/delegate-class). Unlike Java functional interfaces, delegates in .NET default to multicast delegates, and .NET declares a variety of generic delegates ranging from no parameters to 16 parameters, from no return value to return value. Therefore, developers can use .NET's declared delegates instead of declaring their own. For details, see [CSharp-Delegate](https://blog.ryuu64.top/CSharp-%E5%A7%94%E6%89%98/), [Functional programming](https://en.wikipedia.org/wiki/Comparison_of_C_Sharp_and_Java#Functional_programming).
 
-[^2]: The parameter table of this functional interface is [(TSender sender, TEventArgs arg)](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/ functional/EventHandler.java#L7), see [EventHandler.java](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/EventHandler.java for details ) and [**EventArgs.java**](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/EventArgs.java).
+[^2]: The parameter table of this functional interface is [(TSender sender, TEventArgs arg)](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/EventHandler.java#L7), see [EventHandler.java](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/EventHandler.java) and [**EventArgs.java**](https://github.com/Ryuu-64/Functional/blob/main/src/main/java/org/ryuu/functional/EventArgs.java) for details.
 
 [^3]: **java does not allow developers to define operator overloading**, so the operation of multicast generic functional interface does not have syntactic sugar such as +, +=, - and -= delegated in C#.
 
@@ -68,4 +68,4 @@ If you find any bugs or have any suggestions, please contact [me (ryuu)](64ryuu@
 
 [^5]: In particular, if the input of contains is a multicast, it will be judged that the current multicast is a continuous subsequence of the elements of the multicast set with the input of the input.
 
-[^6]: Such as Observer Pattern ([Observer Pattern](https://en.wikipedia.org/wiki/Observer_pattern)) and Publish-subscribe Pattern ([Publish-subscribe Pattern](https://en.wikipedia. org/wiki/Publish%E2%80%93subscribe_pattern)).
+[^6]: Such as [Observer Pattern](https://en.wikipedia.org/wiki/Observer_pattern) and [Publish-subscribe Pattern](https://en.wikipedia.org/wiki/Publish-subscribe_pattern).

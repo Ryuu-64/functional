@@ -66,4 +66,4 @@
 
 [^5]:特别的，若 contains 入参为多播，将会判断当前多播中是有入参多播集合元素的连续子序列
 
-[^6]:如观察者模式 ([Observer Pattern](https://en.wikipedia.org/wiki/Observer_pattern)) 和发布订阅模式 ([Publish-subscribe Pattern](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern))。
+[^6]:如[观察者模式 (Observer Pattern)](https://en.wikipedia.org/wiki/Observer_pattern) 和[发布订阅模式 (Publish-subscribe Pattern)](https://en.wikipedia.org/wiki/Publish-subscribe_pattern)。
