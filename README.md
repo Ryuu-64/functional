@@ -44,7 +44,7 @@
 
 2. Iteratively write functional interface collections
 
-   Write like [Observer Pattern](https://en.wikipedia.org/wiki/Observer_pattern) and [Publish-subscribe Pattern](https://en.wikipedia.org/wiki /Publish%E2%80%93subscribe_pattern), you need to maintain a collection of functional interfaces to implement multicast. And this practice is very common, and if you write an implementation of a functional interface collection every time you need it, there will be many unnecessary duplicate code segments. Using the multicast generic functional interface in this library eliminates the need to repeatedly write multicast implementations.
+   Write like [Observer Pattern](https://en.wikipedia.org/wiki/Observer_pattern) and [Publish-subscribe Pattern](https://en.wikipedia.org/wiki/Publish-subscribe_pattern), you need to maintain a collection of functional interfaces to implement multicast. And this practice is very common, and if you write an implementation of a functional interface collection every time you need it, there will be many unnecessary duplicate code segments. Using the multicast generic functional interface in this library eliminates the need to repeatedly write multicast implementations.
 
 3. Unnecessary coupling
 
