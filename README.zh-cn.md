@@ -1,6 +1,6 @@
 # Functional
 
-[![](https://jitpack.io/v/Ryuu-64/Functional.svg)](https://jitpack.io/#Ryuu-64/Functional)
+[![](https://jitpack.io/v/Ryuu-64/Functional.svg)](https://jitpack.io/#Ryuu-64/Functional)[![](https://img.shields.io/badge/JDK-8+-green.svg)](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html)[![Codacy Badge](https://app.codacy.com/project/badge/Grade/78f7db806d5c44a795d338657c170b71)](https://www.codacy.com/gh/Ryuu-64/Functional/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Ryuu-64/Functional&amp;utm_campaign=Badge_Grade)
 
 ## 这是什么？
 

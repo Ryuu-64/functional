@@ -4,19 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class FunctionalTest {
-    private FunctionalTest() {
-    }
-
-    @Test
-    void addGenericCheck() {
-        Action1Arg<Integer> action1 = new Action1Arg<>();
-//        action1.add((IAction1Arg<Double>) (Double $double) -> System.out.println($double));
-//        action1.add((Double $double) -> System.out.println($double));
-        Action1Arg<Double> action2 = new Action1Arg<>();
-//        action1.add(action2);
-    }
-
     @SuppressWarnings("MismatchedQueryAndUpdateOfStringBuilder")
     @Test
     void addMulticast() {
@@ -26,28 +17,25 @@ public class FunctionalTest {
         action1.add(($int) -> stringBuilder.append($int + 1));
         action1.add(($int) -> stringBuilder.append($int + 2));
         action1.invoke(0);
-        assert stringBuilder.toString().equals("012");
+        assertEquals(stringBuilder.toString(), "012");
         stringBuilder.delete(0, stringBuilder.length());
-
         Action1Arg<Integer> action2 = new Action1Arg<>();
         action2.add(stringBuilder::append);
         action2.add(($int) -> stringBuilder.append($int + 1));
         action2.add(($int) -> stringBuilder.append($int + 2));
         action2.invoke(0);
-        assert stringBuilder.toString().equals("012");
+        assertEquals(stringBuilder.toString(), "012");
         stringBuilder.delete(0, stringBuilder.length());
-
         action1.add(action2);
         action1.invoke(0);
-        assert stringBuilder.toString().equals("012012");
+        assertEquals(stringBuilder.toString(), "012012");
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Test
     void addNull() {
         Action action = new Action();
-        assert !action.add(null);
-        assert action.count() == 0;
+        assertFalse(action.add(null));
+        assertEquals(action.count(), 0);
     }
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfStringBuilder")
@@ -72,19 +60,18 @@ public class FunctionalTest {
         action2.add(iAction3);
         action2.add(iAction4);
 
-        assert action1.remove(action2);
-        assert !action1.remove(action2);
+        assertTrue(action1.remove(action2));
+        assertFalse(action1.remove(action2));
 
         action1.invoke();
-        assert stringBuilder.toString().equals("012");
+        assertEquals(stringBuilder.toString(), "012");
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Test
     void removeNull() {
         Action action = new Action();
-        assert !action.remove(null);
-        assert action.count() == 0;
+        assertFalse(action.remove(null));
+        assertEquals(action.count(), 0);
     }
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfStringBuilder")
@@ -100,12 +87,12 @@ public class FunctionalTest {
         for (IAction act : functionalList) {
             act.invoke();
         }
-        assert stringBuilder.toString().equals("01234");
+        assertEquals(stringBuilder.toString(), "01234");
         stringBuilder.delete(0, stringBuilder.length());
 
         // copy list remove
         functionalList.clear();
-        assert stringBuilder.toString().equals("");
+        assertEquals(stringBuilder.toString(), "");
         stringBuilder.delete(0, stringBuilder.length());
 
         // copy list add
@@ -116,19 +103,19 @@ public class FunctionalTest {
         for (IAction act : functionalList) {
             act.invoke();
         }
-        assert stringBuilder.toString().equals("01234");
+        assertEquals(stringBuilder.toString(), "01234");
+
         stringBuilder.delete(0, stringBuilder.length());
 
         // origin not change
         action.invoke();
-        assert stringBuilder.toString().equals("01234");
+        assertEquals(stringBuilder.toString(), "01234");
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Test
     void containsNull() {
         Action action = new Action();
-        assert !action.contains(null);
+        assertFalse(action.contains(null));
     }
 
     @Test
@@ -169,54 +156,15 @@ public class FunctionalTest {
         action.add(($int) -> action.clear());
         action.add(($int) -> stringBuilder.append($int + 2));
         action.invoke(0);
-        assert stringBuilder.toString().equals("01");
+        assertEquals(stringBuilder.toString(), "01");
         stringBuilder.delete(0, stringBuilder.length());
-    }
-
-    @SuppressWarnings("Convert2MethodRef")
-    @Test
-    void generic() {
-        Action1Arg<Object> action1 = new Action1Arg<>();
-//        action1.add((Float $float) -> System.out.println($float));
-        Action1Arg<Object> action2 = new Action1Arg<>();
-        action2.add((Object object) -> System.out.println(object));
-        assert action1.add(action2);
-//        action1.add(new Action1Arg<Float>());
     }
 
     @SuppressWarnings("UnnecessaryBoxing")
     @Test
     void contravariant() {
-        Action1Arg<Number> action = new Action1Arg<>();
-        action.add(System.out::println);
-        action.invoke(Double.valueOf(1));
-    }
-
-    @Test
-    void covariant() {
-        Action1Arg<Double> action = new Action1Arg<>();
-        action.add(System.out::println);
-//        action.invoke(new Number() {
-//            @Override
-//            public int intValue() {
-//                return 0;
-//            }
-//
-//            @Override
-//            public long longValue() {
-//                return 0;
-//            }
-//
-//            @Override
-//            public float floatValue() {
-//                return 0;
-//            }
-//
-//            @Override
-//            public double doubleValue() {
-//                return 0;
-//            }
-//        });
+        IFunc<Number> action = () -> Double.valueOf(1);
+        assertEquals(action.invoke(), 1.0d);
     }
 
     @Test
@@ -229,8 +177,7 @@ public class FunctionalTest {
         action.add(() -> result[0] += "4");
         action.add(() -> result[0] += "5");
         action.add(() -> {
-            System.out.println(result[0]);
-            assert result[0].equals("12345");
+            assertEquals(result[0], "12345");
             result[0] = "";
         });
 
@@ -240,7 +187,6 @@ public class FunctionalTest {
                     action.invoke();
                 }
             }).start();
-
         }
     }
 
@@ -254,11 +200,11 @@ public class FunctionalTest {
         action1.add(println2);
         action2.add(println1);
         action2.add(println2);
-        assert action1.equals(action2);
-        assert action2.equals(action1);
+        assertEquals(action1, action2);
+        assertEquals(action2, action1);
         action1.add(println1);
-        assert !action1.equals(action2);
-        assert !action2.equals(action1);
+        assertNotEquals(action1, action2);
+        assertNotEquals(action2, action1);
     }
 
     @Test
@@ -271,8 +217,8 @@ public class FunctionalTest {
         action1.add(println2);
         action2.add(println1);
         action2.add(println2);
-        assert action1.hashCode() == action2.hashCode();
+        assertEquals(action1.hashCode(), action2.hashCode());
         action1.add(println1);
-        assert action1.hashCode() != action2.hashCode();
+        assertNotEquals(action1.hashCode(), action2.hashCode());
     }
 }
