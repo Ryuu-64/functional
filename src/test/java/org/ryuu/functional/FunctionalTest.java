@@ -12,22 +12,24 @@ public class FunctionalTest {
     @Test
     void addMulticast() {
         StringBuilder stringBuilder = new StringBuilder();
-        Action1Arg<Integer> action1 = new Action1Arg<>();
-        action1.add(stringBuilder::append);
-        action1.add(($int) -> stringBuilder.append($int + 1));
-        action1.add(($int) -> stringBuilder.append($int + 2));
-        action1.invoke(0);
+        Action action1 = new Action();
+        action1.add(() -> stringBuilder.append(0));
+        action1.add(() -> stringBuilder.append(1));
+        action1.add(() -> stringBuilder.append(2));
+        action1.invoke();
         assertEquals(stringBuilder.toString(), "012");
+
         stringBuilder.delete(0, stringBuilder.length());
-        Action1Arg<Integer> action2 = new Action1Arg<>();
-        action2.add(stringBuilder::append);
-        action2.add(($int) -> stringBuilder.append($int + 1));
-        action2.add(($int) -> stringBuilder.append($int + 2));
-        action2.invoke(0);
+        Action action2 = new Action();
+        action2.add(() -> stringBuilder.append(0));
+        action2.add(() -> stringBuilder.append(1));
+        action2.add(() -> stringBuilder.append(2));
+        action2.invoke();
         assertEquals(stringBuilder.toString(), "012");
+
         stringBuilder.delete(0, stringBuilder.length());
         action1.add(action2);
-        action1.invoke(0);
+        action1.invoke();
         assertEquals(stringBuilder.toString(), "012012");
     }
 
@@ -93,8 +95,8 @@ public class FunctionalTest {
         // copy list remove
         functionalList.clear();
         assertEquals(stringBuilder.toString(), "");
-        stringBuilder.delete(0, stringBuilder.length());
 
+        stringBuilder.delete(0, stringBuilder.length());
         // copy list add
         for (int i = 0; i < 5; i++) {
             int finalI = i;
@@ -106,9 +108,8 @@ public class FunctionalTest {
         assertEquals(stringBuilder.toString(), "01234");
 
         stringBuilder.delete(0, stringBuilder.length());
-
-        // origin not change
         action.invoke();
+        // origin functional list will not change
         assertEquals(stringBuilder.toString(), "01234");
     }
 
@@ -138,12 +139,10 @@ public class FunctionalTest {
         action2.add(iAction2);
         action2.add(iAction3);
         action2.add(iAction4);
-
-        assert action1.contains(action2);
+        assertTrue(action1.contains(action2));
 
         action2.add(iAction4);
-
-        assert !action1.contains(action2);
+        assertFalse(action1.contains(action2));
     }
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfStringBuilder")
@@ -157,7 +156,6 @@ public class FunctionalTest {
         action.add(($int) -> stringBuilder.append($int + 2));
         action.invoke(0);
         assertEquals(stringBuilder.toString(), "01");
-        stringBuilder.delete(0, stringBuilder.length());
     }
 
     @SuppressWarnings("UnnecessaryBoxing")
@@ -202,6 +200,7 @@ public class FunctionalTest {
         action2.add(println2);
         assertEquals(action1, action2);
         assertEquals(action2, action1);
+
         action1.add(println1);
         assertNotEquals(action1, action2);
         assertNotEquals(action2, action1);
@@ -218,6 +217,7 @@ public class FunctionalTest {
         action2.add(println1);
         action2.add(println2);
         assertEquals(action1.hashCode(), action2.hashCode());
+
         action1.add(println1);
         assertNotEquals(action1.hashCode(), action2.hashCode());
     }
