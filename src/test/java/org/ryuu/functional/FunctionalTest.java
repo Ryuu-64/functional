@@ -2,15 +2,15 @@ package org.ryuu.functional;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FunctionalTest {
     @SuppressWarnings("MismatchedQueryAndUpdateOfStringBuilder")
     @Test
-    void addMulticast() {
+    void addTest() {
         StringBuilder stringBuilder = new StringBuilder();
         Action action1 = new Action();
         action1.add(() -> stringBuilder.append(0));
@@ -34,7 +34,7 @@ public class FunctionalTest {
     }
 
     @Test
-    void addNull() {
+    void addNullTest() {
         Action action = new Action();
         assertFalse(action.add(null));
         assertEquals(action.count(), 0);
@@ -42,7 +42,7 @@ public class FunctionalTest {
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfStringBuilder")
     @Test
-    void removeMulticast() {
+    void removeTest() {
         StringBuilder stringBuilder = new StringBuilder();
         Action action1 = new Action();
         Action action2 = new Action();
@@ -70,7 +70,7 @@ public class FunctionalTest {
     }
 
     @Test
-    void removeNull() {
+    void removeNullTest() {
         Action action = new Action();
         assertFalse(action.remove(null));
         assertEquals(action.count(), 0);
@@ -78,7 +78,7 @@ public class FunctionalTest {
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfStringBuilder")
     @Test
-    void getFunctionalList() {
+    void getFunctionalListTest() {
         Action action = new Action();
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < 5; i++) {
@@ -114,13 +114,13 @@ public class FunctionalTest {
     }
 
     @Test
-    void containsNull() {
+    void containsNullTest() {
         Action action = new Action();
         assertFalse(action.contains(null));
     }
 
     @Test
-    void containsMulticast() {
+    void containsTest() {
         Action action1 = new Action();
         Action action2 = new Action();
 
@@ -147,26 +147,26 @@ public class FunctionalTest {
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfStringBuilder")
     @Test
-    void clear() {
+    void clearTest() {
         StringBuilder stringBuilder = new StringBuilder();
-        Action1Arg<Integer> action = new Action1Arg<>();
-        action.add(stringBuilder::append);
-        action.add(($int) -> stringBuilder.append($int + 1));
-        action.add(($int) -> action.clear());
-        action.add(($int) -> stringBuilder.append($int + 2));
-        action.invoke(0);
+        Action action = new Action();
+        action.add(() -> stringBuilder.append(0));
+        action.add(() -> stringBuilder.append(1));
+        action.add(action::clear);
+        action.add(() -> stringBuilder.append(2));
+        action.invoke();
         assertEquals(stringBuilder.toString(), "01");
     }
 
     @SuppressWarnings("UnnecessaryBoxing")
     @Test
-    void contravariant() {
+    void contravariantTest() {
         IFunc<Number> action = () -> Double.valueOf(1);
         assertEquals(action.invoke(), 1.0d);
     }
 
     @Test
-    void multiThread() {
+    void multiThreadSafeTest() {
         final String[] result = {""};
         Action action = new Action();
         action.add(() -> result[0] += "1");
@@ -174,22 +174,27 @@ public class FunctionalTest {
         action.add(() -> result[0] += "3");
         action.add(() -> result[0] += "4");
         action.add(() -> result[0] += "5");
-        action.add(() -> {
-            assertEquals(result[0], "12345");
-            result[0] = "";
-        });
-
+        List<Thread> threads = new ArrayList<>();
         for (int i = 0; i < 16; i++) {
-            new Thread(() -> {
-                while (true) {
-                    action.invoke();
-                }
-            }).start();
+            threads.add(new Thread(action::invoke));
+        }
+        for (Thread thread : threads) {
+            thread.start();
+        }
+        StringBuilder expected = new StringBuilder();
+        for (int i = 0; i < 16; i++) {
+            expected.append("12345");
+        }
+        while (true) {
+            if (threads.stream().noneMatch(Thread::isAlive)) {
+                assertEquals(expected.toString(), result[0]);
+                return;
+            }
         }
     }
 
     @Test
-    void equals() {
+    void equalsTest() {
         IAction println1 = () -> System.out.println(1);
         IAction println2 = () -> System.out.println(2);
         Action action1 = new Action();
