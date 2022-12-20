@@ -257,4 +257,19 @@ class MulticastTest {
         action1.add(println1);
         assertNotEquals(action1.hashCode(), action2.hashCode());
     }
+
+    @Test
+    void sideEffect() {
+        final int[] res = {0};
+        Action action1 = new Action();
+        action1.add(() -> res[0]++);
+
+        Action action2 = new Action();
+        action2.add(action1);
+
+        action1.add(() -> res[0]++);
+
+        action2.invoke();
+        assertEquals(1, res[0]);
+    }
 }
