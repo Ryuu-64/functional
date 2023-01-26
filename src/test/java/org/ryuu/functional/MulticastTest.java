@@ -1,6 +1,8 @@
 package org.ryuu.functional;
 
 import org.junit.jupiter.api.Test;
+import org.openjdk.jol.info.ClassLayout;
+import org.openjdk.jol.info.GraphLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -271,5 +273,44 @@ class MulticastTest {
 
         action2.invoke();
         assertEquals(1, res[0]);
+    }
+
+    @Test
+    void testJavaObjectLayout() {
+        Action action = new Action();
+        ClassLayout classLayout = ClassLayout.parseInstance(action);
+        int objectHeaderMarkSize = 8;
+        int objectHeaderClassSize = 4;
+        int unicastListSize = 4;
+        int iteratorSize = 4;
+        int objectAlignmentGapSize = 4;
+        assertEquals(
+                objectHeaderMarkSize +
+                        objectHeaderClassSize +
+                        unicastListSize +
+                        iteratorSize +
+                        objectAlignmentGapSize,
+                classLayout.instanceSize()
+        );
+        System.out.println(classLayout.toPrintable());
+
+        GraphLayout graphLayout = GraphLayout.parseInstance(action);
+        int unicastListElementDataSize = 16;
+        int actionSize = 24;
+        int arrayListSize = 24;
+        // 8 (object header:mark)
+        // 4 (object header:class)
+        // 4 int Iterator.cursor
+        // 4 org.ryuu.functional.Multicast Iterator.multicast
+        // 4 (object alignment gap)
+        int multicastIteratorSize = 24;
+        assertEquals(
+                unicastListElementDataSize +
+                        actionSize +
+                        arrayListSize +
+                        multicastIteratorSize,
+                graphLayout.totalSize()
+        );
+        System.out.println(graphLayout.toPrintable());
     }
 }
