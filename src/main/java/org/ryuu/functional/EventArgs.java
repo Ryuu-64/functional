@@ -1,5 +1,6 @@
 package org.ryuu.functional;
 
 public class EventArgs {
-    public static final EventArgs Empty = new EventArgs();
+    @SuppressWarnings("InstantiationOfUtilityClass")
+    public static final EventArgs EMPTY = new EventArgs();
 }

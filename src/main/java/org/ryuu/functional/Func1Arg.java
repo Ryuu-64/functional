@@ -1,14 +1,6 @@
 package org.ryuu.functional;
 
-public final class Func1Arg<T, TResult>
-        extends Multicast<IFunc1Arg<T, TResult>>
-        implements IFunc1Arg<T, TResult> {
-    @Override
-    public synchronized TResult invoke(T arg) {
-        TResult result = null;
-        for (IFunc1Arg<T, TResult> functional : this) {
-            result = functional.invoke(arg);
-        }
-        return result;
-    }
+@FunctionalInterface
+public interface Func1Arg<T, TResult> extends Unicast {
+    TResult invoke(T arg);
 }

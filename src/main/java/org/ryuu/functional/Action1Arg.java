@@ -1,12 +1,6 @@
 package org.ryuu.functional;
 
-public final class Action1Arg<T>
-        extends Multicast<IAction1Arg<T>>
-        implements IAction1Arg<T> {
-    @Override
-    public synchronized void invoke(T arg) {
-        for (IAction1Arg<T> functional : this) {
-            functional.invoke(arg);
-        }
-    }
+@FunctionalInterface
+public interface Action1Arg<T> extends Unicast {
+    void invoke(T arg);
 }
