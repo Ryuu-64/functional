@@ -39,7 +39,7 @@ class MulticastTest {
     }
 
     @Test
-    void add() {
+    void addUnicast() {
         StringBuilder stringBuilder = new StringBuilder();
         Actions actions1 = new Actions();
         actions1.add(() -> stringBuilder.append(0));
@@ -63,6 +63,21 @@ class MulticastTest {
     }
 
     @Test
+    void addMulticast() {
+        final int[] res = {0};
+        Actions actions1 = new Actions();
+        actions1.add(() -> res[0]++);
+
+        Actions actions2 = new Actions();
+        actions2.add(actions1);
+
+        actions1.add(() -> res[0]++);
+
+        actions2.invoke();
+        assertEquals(1, res[0]);
+    }
+
+    @Test
     void addNull() {
         Actions actions = new Actions();
         assertFalse(actions.add(null));
@@ -77,31 +92,53 @@ class MulticastTest {
     }
 
     @Test
-    void remove() {
+    void removeUnicast() {
+        StringBuilder stringBuilder = new StringBuilder();
+        Actions actions = new Actions();
+
+        Action action = () -> stringBuilder.append(0);
+
+        actions.add(action);
+
+        actions.invoke();
+        assertEquals("0", stringBuilder.toString());
+
+        assertTrue(actions.remove(action));
+
+        actions.invoke();
+        assertEquals("0", stringBuilder.toString());
+
+        assertFalse(actions.remove(action));
+    }
+
+    @Test
+    void removeMulticast() {
         StringBuilder stringBuilder = new StringBuilder();
         Actions actions1 = new Actions();
         Actions actions2 = new Actions();
 
-        Action iAction0 = () -> stringBuilder.append(0);
-        Action iAction1 = () -> stringBuilder.append(1);
-        Action iAction2 = () -> stringBuilder.append(2);
-        Action iAction3 = () -> stringBuilder.append(3);
-        Action iAction4 = () -> stringBuilder.append(4);
+        Action action0 = () -> stringBuilder.append(0);
+        Action action1 = () -> stringBuilder.append(1);
+        Action action2 = () -> stringBuilder.append(2);
+        Action action3 = () -> stringBuilder.append(3);
+        Action action4 = () -> stringBuilder.append(4);
 
-        actions1.add(iAction0);
-        actions1.add(iAction1);
-        actions1.add(iAction2);
-        actions1.add(iAction3);
-        actions1.add(iAction4);
+        actions1.add(action0);
+        actions1.add(action1);
+        actions1.add(action2);
+        actions1.add(action3);
+        actions1.add(action4);
+        actions1.add(action3);
 
-        actions2.add(iAction3);
-        actions2.add(iAction4);
+        actions2.add(action3);
+        actions2.add(action4);
+        actions2.add(action3);
 
         assertTrue(actions1.remove(actions2));
         assertFalse(actions1.remove(actions2));
 
         actions1.invoke();
-        assertEquals(stringBuilder.toString(), "012");
+        assertEquals("012", stringBuilder.toString());
     }
 
     @Test
@@ -112,25 +149,47 @@ class MulticastTest {
     }
 
     @Test
-    void contains() {
+    void containsUnicast() {
+        Actions actions1 = new Actions();
+
+        Action action0 = () -> {
+        };
+
+        actions1.add(action0);
+
+        assertTrue(actions1.contains(action0));
+
+        actions1.remove(action0);
+        assertFalse(actions1.contains(action0));
+    }
+
+    @Test
+    void containsMulticast() {
         Actions actions1 = new Actions();
         Actions actions2 = new Actions();
 
-        Action action0 = () -> System.out.println(0);
-        Action action1 = () -> System.out.println(1);
-        Action action2 = () -> System.out.println(2);
-        Action action3 = () -> System.out.println(3);
-        Action action4 = () -> System.out.println(4);
+        Action action0 = () -> {
+        };
+        Action action1 = () -> {
+        };
+        Action action2 = () -> {
+        };
+        Action action3 = () -> {
+        };
+        Action action4 = () -> {
+        };
 
         actions1.add(action0);
         actions1.add(action1);
         actions1.add(action2);
         actions1.add(action3);
         actions1.add(action4);
+        actions1.add(action3);
 
-        actions2.add(action2);
         actions2.add(action3);
         actions2.add(action4);
+        actions2.add(action3);
+
         assertTrue(actions1.contains(actions2));
 
         actions2.add(action4);
@@ -170,7 +229,8 @@ class MulticastTest {
     void count() {
         Actions actions = new Actions();
         assertEquals(0, actions.count());
-        actions.add(() -> {});
+        actions.add(() -> {
+        });
         assertEquals(1, actions.count());
     }
 
@@ -262,22 +322,7 @@ class MulticastTest {
     }
 
     @Test
-    void sideEffect() {
-        final int[] res = {0};
-        Actions actions1 = new Actions();
-        actions1.add(() -> res[0]++);
-
-        Actions actions2 = new Actions();
-        actions2.add(actions1);
-
-        actions1.add(() -> res[0]++);
-
-        actions2.invoke();
-        assertEquals(1, res[0]);
-    }
-
-    @Test
-    void testJavaObjectLayout() {
+    void javaObjectLayout() {
         Actions actions = new Actions();
 /*
 org.ryuu.functional.Actions object internals:

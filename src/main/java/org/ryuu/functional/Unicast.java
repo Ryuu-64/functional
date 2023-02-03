@@ -1,4 +1,6 @@
 package org.ryuu.functional;
 
-interface Unicast extends Functional {
+import java.util.EventListener;
+
+interface Unicast extends EventListener {
 }
