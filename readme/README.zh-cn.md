@@ -1,4 +1,4 @@
-# Functional
+# functional
 
 [![](https://jitpack.io/v/Ryuu-64/Functional.svg)](https://jitpack.io/#Ryuu-64/Functional)[![](https://img.shields.io/badge/JDK-8+-green.svg)](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html)[![Codacy Badge](https://app.codacy.com/project/badge/Grade/f95a917e82d34e74a03b51114e9d11ec)](https://www.codacy.com/gh/Ryuu-64/Functional/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Ryuu-64/Functional&amp;utm_campaign=Badge_Grade)
 

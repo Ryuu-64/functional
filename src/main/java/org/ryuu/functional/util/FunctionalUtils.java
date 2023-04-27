@@ -78,57 +78,57 @@ public class FunctionalUtils {
         }
     }
 
-    public <TResult> TResult invokeNonNull(Func<TResult> func) {
+    public static <TResult> TResult invokeNonNull(Func<TResult> func) {
         return func.invoke();
     }
 
-    public <T, TResult> TResult invokeNonNull(Func1Arg<T, TResult> func1Arg, T arg) {
+    public static <T, TResult> TResult invokeNonNull(Func1Arg<T, TResult> func1Arg, T arg) {
         return func1Arg.invoke(arg);
     }
 
-    public <T1, T2, TResult> TResult invokeNonNull(
+    public static <T1, T2, TResult> TResult invokeNonNull(
             Func2Args<T1, T2, TResult> func2Args,
             T1 arg1, T2 arg2
     ) {
         return func2Args.invoke(arg1, arg2);
     }
 
-    public <T1, T2, T3, TResult> TResult invokeNonNull(
+    public static <T1, T2, T3, TResult> TResult invokeNonNull(
             Func3Args<T1, T2, T3, TResult> func3Args,
             T1 arg1, T2 arg2, T3 arg3
     ) {
         return func3Args.invoke(arg1, arg2, arg3);
     }
 
-    public <T1, T2, T3, T4, TResult> TResult invokeNonNull(
+    public static <T1, T2, T3, T4, TResult> TResult invokeNonNull(
             Func4Args<T1, T2, T3, T4, TResult> func4Args,
             T1 arg1, T2 arg2, T3 arg3, T4 arg4
     ) {
         return func4Args.invoke(arg1, arg2, arg3, arg4);
     }
 
-    public <T1, T2, T3, T4, T5, TResult> TResult invokeNonNull(
+    public static <T1, T2, T3, T4, T5, TResult> TResult invokeNonNull(
             Func5Args<T1, T2, T3, T4, T5, TResult> func5Args,
             T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5
     ) {
         return func5Args.invoke(arg1, arg2, arg3, arg4, arg5);
     }
 
-    public <T1, T2, T3, T4, T5, T6, TResult> TResult invokeNonNull(
+    public static <T1, T2, T3, T4, T5, T6, TResult> TResult invokeNonNull(
             Func6Args<T1, T2, T3, T4, T5, T6, TResult> func6Args,
             T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6
     ) {
         return func6Args.invoke(arg1, arg2, arg3, arg4, arg5, arg6);
     }
 
-    public <T1, T2, T3, T4, T5, T6, T7, TResult> TResult invokeNonNull(
+    public static <T1, T2, T3, T4, T5, T6, T7, TResult> TResult invokeNonNull(
             Func7Args<T1, T2, T3, T4, T5, T6, T7, TResult> func7Args,
             T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7
     ) {
         return func7Args.invoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
     }
 
-    public <T1, T2, T3, T4, T5, T6, T7, T8, TResult> TResult invokeNonNull(
+    public static <T1, T2, T3, T4, T5, T6, T7, T8, TResult> TResult invokeNonNull(
             Func8Args<T1, T2, T3, T4, T5, T6, T7, T8, TResult> func8Args,
             T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8
     ) {

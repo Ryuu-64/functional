@@ -1,4 +1,4 @@
-# Functional
+# functional
 
 [简体中文](https://github.com/Ryuu-64/Functional/blob/main/README.zh-cn.md)
 
