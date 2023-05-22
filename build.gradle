@@ -5,24 +5,28 @@ plugins {
 group 'org.ryuu'
 version '1.1.0'
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.3'
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.3'
     // https://mvnrepository.com/artifact/org.openjdk.jol/jol-core
     testImplementation 'org.openjdk.jol:jol-core:0.17'
+    // https://mvnrepository.com/artifact/org.openjdk.jmh/jmh-core
+    testImplementation 'org.openjdk.jmh:jmh-core:1.36'
+    // https://mvnrepository.com/artifact/org.openjdk.jmh/jmh-generator-annprocess
+    testAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.36'
 }
 
 test {
     useJUnitPlatform()
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
 }
