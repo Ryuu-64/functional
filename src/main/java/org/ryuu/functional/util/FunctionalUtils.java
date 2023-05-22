@@ -79,59 +79,95 @@ public class FunctionalUtils {
     }
 
     public static <TResult> TResult invokeNonNull(Func<TResult> func) {
-        return func.invoke();
+        if (func != null) {
+            return func.invoke();
+        }
+
+        return null;
     }
 
     public static <T, TResult> TResult invokeNonNull(Func1Arg<T, TResult> func1Arg, T arg) {
-        return func1Arg.invoke(arg);
+        if (func1Arg != null) {
+            return func1Arg.invoke(arg);
+        }
+
+        return null;
     }
 
     public static <T1, T2, TResult> TResult invokeNonNull(
             Func2Args<T1, T2, TResult> func2Args,
             T1 arg1, T2 arg2
     ) {
-        return func2Args.invoke(arg1, arg2);
+        if (func2Args != null) {
+            return func2Args.invoke(arg1, arg2);
+        }
+
+        return null;
     }
 
     public static <T1, T2, T3, TResult> TResult invokeNonNull(
             Func3Args<T1, T2, T3, TResult> func3Args,
             T1 arg1, T2 arg2, T3 arg3
     ) {
-        return func3Args.invoke(arg1, arg2, arg3);
+        if (func3Args != null) {
+            return func3Args.invoke(arg1, arg2, arg3);
+        }
+
+        return null;
     }
 
     public static <T1, T2, T3, T4, TResult> TResult invokeNonNull(
             Func4Args<T1, T2, T3, T4, TResult> func4Args,
             T1 arg1, T2 arg2, T3 arg3, T4 arg4
     ) {
-        return func4Args.invoke(arg1, arg2, arg3, arg4);
+        if (func4Args != null) {
+            return func4Args.invoke(arg1, arg2, arg3, arg4);
+        }
+
+        return null;
     }
 
     public static <T1, T2, T3, T4, T5, TResult> TResult invokeNonNull(
             Func5Args<T1, T2, T3, T4, T5, TResult> func5Args,
             T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5
     ) {
-        return func5Args.invoke(arg1, arg2, arg3, arg4, arg5);
+        if (func5Args != null) {
+            return func5Args.invoke(arg1, arg2, arg3, arg4, arg5);
+        }
+
+        return null;
     }
 
     public static <T1, T2, T3, T4, T5, T6, TResult> TResult invokeNonNull(
             Func6Args<T1, T2, T3, T4, T5, T6, TResult> func6Args,
             T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6
     ) {
-        return func6Args.invoke(arg1, arg2, arg3, arg4, arg5, arg6);
+        if (func6Args != null) {
+            return func6Args.invoke(arg1, arg2, arg3, arg4, arg5, arg6);
+        }
+
+        return null;
     }
 
     public static <T1, T2, T3, T4, T5, T6, T7, TResult> TResult invokeNonNull(
             Func7Args<T1, T2, T3, T4, T5, T6, T7, TResult> func7Args,
             T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7
     ) {
-        return func7Args.invoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+        if (func7Args != null) {
+            return func7Args.invoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+        }
+
+        return null;
     }
 
     public static <T1, T2, T3, T4, T5, T6, T7, T8, TResult> TResult invokeNonNull(
             Func8Args<T1, T2, T3, T4, T5, T6, T7, T8, TResult> func8Args,
             T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8
     ) {
-        return func8Args.invoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+        if (func8Args != null) {
+            return func8Args.invoke(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+        }
+
+        return null;
     }
 }
