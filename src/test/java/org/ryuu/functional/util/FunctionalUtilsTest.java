@@ -18,12 +18,24 @@ class FunctionalUtilsTest {
     }
 
     @Test
+    void actionsInvokeNonNullWithNull() {
+        Actions actions = new Actions();
+        FunctionalUtils.invokeNonNull(actions);
+    }
+
+    @Test
     void actions1ArgInvokeNonNull() {
         final String[] string = new String[1];
         Actions1Arg<String> actions1Arg = new Actions1Arg<>();
         actions1Arg.add(arg -> string[0] = arg);
         FunctionalUtils.invokeNonNull(actions1Arg, defaultValue);
         assertEquals(defaultValue, string[0]);
+    }
+
+    @Test
+    void actions1ArgInvokeNonNullWithNull() {
+        Actions1Arg<String> actions1Arg = new Actions1Arg<>();
+        FunctionalUtils.invokeNonNull(actions1Arg, null);
     }
 
     @Test
@@ -37,6 +49,11 @@ class FunctionalUtilsTest {
         assertEquals(defaultValue, string[0]);
     }
 
+    @Test
+    void actions2ArgsInvokeNonNullWithNull() {
+        Actions2Args<String, String> actions2Args = new Actions2Args<>();
+        FunctionalUtils.invokeNonNull(actions2Args, null, null);
+    }
 
     @Test
     void actions3ArgsInvokeNonNull() {
@@ -47,6 +64,12 @@ class FunctionalUtilsTest {
                 actions3Args, defaultValue, defaultValue, defaultValue
         );
         assertEquals(defaultValue, string[0]);
+    }
+
+    @Test
+    void actions3ArgsInvokeNonNullWithNull() {
+        Actions3Args<String, String, String> actions3Args = new Actions3Args<>();
+        FunctionalUtils.invokeNonNull(actions3Args, null, null, null);
     }
 
     @Test
@@ -61,6 +84,12 @@ class FunctionalUtilsTest {
     }
 
     @Test
+    void actions4ArgsInvokeNonNullWithNull() {
+        Actions4Args<String, String, String, String> actions4Args = new Actions4Args<>();
+        FunctionalUtils.invokeNonNull(actions4Args, null, null, null, null);
+    }
+
+    @Test
     void actions5ArgsInvokeNonNull() {
         final String[] string = new String[1];
         Actions5Args<String, String, String, String, String> actions5Args = new Actions5Args<>();
@@ -71,6 +100,14 @@ class FunctionalUtilsTest {
         assertEquals(defaultValue, string[0]);
     }
 
+    @Test
+    void actions5ArgsInvokeNonNullWithNull() {
+        Actions5Args<String, String, String, String, String> actions5Args = new Actions5Args<>();
+        FunctionalUtils.invokeNonNull(
+                actions5Args,
+                null, null, null, null, null
+        );
+    }
 
     @Test
     void actions6ArgsInvokeNonNull() {
@@ -82,6 +119,15 @@ class FunctionalUtilsTest {
                 defaultValue, defaultValue, defaultValue, defaultValue, defaultValue, defaultValue
         );
         assertEquals(defaultValue, string[0]);
+    }
+
+    @Test
+    void actions6ArgsInvokeNonNullWithNull() {
+        Actions6Args<String, String, String, String, String, String> actions6Args = new Actions6Args<>();
+        FunctionalUtils.invokeNonNull(
+                actions6Args,
+                null, null, null, null, null, null
+        );
     }
 
     @Test
@@ -97,6 +143,15 @@ class FunctionalUtilsTest {
     }
 
     @Test
+    void actions7ArgsInvokeNonNullWithNull() {
+        Actions7Args<String, String, String, String, String, String, String> actions7Args = new Actions7Args<>();
+        FunctionalUtils.invokeNonNull(
+                actions7Args,
+                null, null, null, null, null, null, null
+        );
+    }
+
+    @Test
     void actions8ArgsInvokeNonNull() {
         final String[] string = new String[1];
         Actions8Args<String, String, String, String, String, String, String, String> actions8Args = new Actions8Args<>();
@@ -109,11 +164,28 @@ class FunctionalUtilsTest {
     }
 
     @Test
+    void actions8ArgsInvokeNonNullWithNull() {
+        Actions8Args<String, String, String, String, String, String, String, String> actions8Args = new Actions8Args<>();
+        FunctionalUtils.invokeNonNull(
+                actions8Args,
+                null, null, null, null, null, null, null, null
+        );
+    }
+
+    @Test
     void funcsInvokeNonNull() {
-        Funcs<String> funcs1Arg = new Funcs<>();
-        funcs1Arg.add(() -> defaultValue);
-        String returnValue = FunctionalUtils.invokeNonNull(funcs1Arg);
+        Funcs<String> funcs = new Funcs<>();
+        funcs.add(() -> defaultValue);
+        String returnValue = FunctionalUtils.invokeNonNull(funcs);
         assertEquals(defaultValue, returnValue);
+    }
+
+    @SuppressWarnings("ConstantValue")
+    @Test
+    void funcsInvokeNonNullWithNull() {
+        Funcs<String> funcs = null;
+        String returnValue = FunctionalUtils.invokeNonNull(funcs);
+        assertNull(returnValue);
     }
 
     @Test
@@ -130,6 +202,13 @@ class FunctionalUtilsTest {
     }
 
     @Test
+    void funcs1ArgInvokeNonNullWithNull() {
+        Funcs1Arg<String, String> funcs1Arg = new Funcs1Arg<>();
+        String returnValue = FunctionalUtils.invokeNonNull(funcs1Arg, null);
+        assertNull(returnValue);
+    }
+
+    @Test
     void funcs2ArgsInvokeNonNull() {
         final String[] string = new String[1];
         Funcs2Args<String, String, String> funcs2Args = new Funcs2Args<>();
@@ -140,6 +219,13 @@ class FunctionalUtilsTest {
         String returnValue = FunctionalUtils.invokeNonNull(funcs2Args, defaultValue, defaultValue);
         assertEquals(defaultValue, string[0]);
         assertEquals(defaultValue, returnValue);
+    }
+
+    @Test
+    void funcs2ArgsInvokeNonNullWithNull() {
+        Funcs2Args<String, String, String> funcs2Args = new Funcs2Args<>();
+        String returnValue = FunctionalUtils.invokeNonNull(funcs2Args, null, null);
+        assertNull(returnValue);
     }
 
     @Test
@@ -158,6 +244,13 @@ class FunctionalUtilsTest {
     }
 
     @Test
+    void funcs3ArgsInvokeNonNullWithNull() {
+        Funcs3Args<String, String, String, String> funcs3Args = new Funcs3Args<>();
+        String returnValue = FunctionalUtils.invokeNonNull(funcs3Args, null, null, null);
+        assertNull(returnValue);
+    }
+
+    @Test
     void funcs4ArgsInvokeNonNull() {
         final String[] string = new String[1];
         Funcs4Args<String, String, String, String, String> funcs4Args = new Funcs4Args<>();
@@ -170,6 +263,13 @@ class FunctionalUtilsTest {
         );
         assertEquals(defaultValue, string[0]);
         assertEquals(defaultValue, returnValue);
+    }
+
+    @Test
+    void funcs4ArgsInvokeNonNullWithNull() {
+        Funcs4Args<String, String, String, String, String> funcs4Args = new Funcs4Args<>();
+        String returnValue = FunctionalUtils.invokeNonNull(funcs4Args, null, null, null, null);
+        assertNull(returnValue);
     }
 
     @Test
@@ -189,6 +289,16 @@ class FunctionalUtilsTest {
     }
 
     @Test
+    void funcs5ArgsInvokeNonNullWithNull() {
+        Funcs5Args<String, String, String, String, String, String> funcs5Args = new Funcs5Args<>();
+        String returnValue = FunctionalUtils.invokeNonNull(
+                funcs5Args,
+                null, null, null, null, null
+        );
+        assertNull(returnValue);
+    }
+
+    @Test
     void funcs6ArgsInvokeNonNull() {
         final String[] string = new String[1];
         Funcs6Args<String, String, String, String, String, String, String> funcs6Args = new Funcs6Args<>();
@@ -202,6 +312,16 @@ class FunctionalUtilsTest {
         );
         assertEquals(defaultValue, string[0]);
         assertEquals(defaultValue, returnValue);
+    }
+
+    @Test
+    void funcs6ArgsInvokeNonNullWithNull() {
+        Funcs6Args<String, String, String, String, String, String, String> funcs6Args = new Funcs6Args<>();
+        String returnValue = FunctionalUtils.invokeNonNull(
+                funcs6Args,
+                null, null, null, null, null, null
+        );
+        assertNull(returnValue);
     }
 
     @Test
@@ -221,6 +341,16 @@ class FunctionalUtilsTest {
     }
 
     @Test
+    void funcs7ArgsInvokeNonNullWithNull() {
+        Funcs7Args<String, String, String, String, String, String, String, String> funcs7Args = new Funcs7Args<>();
+        String returnValue = FunctionalUtils.invokeNonNull(
+                funcs7Args,
+                null, null, null, null, null, null, null
+        );
+        assertNull(returnValue);
+    }
+
+    @Test
     void funcs8ArgsInvokeNonNull() {
         final String[] string = new String[1];
         Funcs8Args<String, String, String, String, String, String, String, String, String> funcs8Args = new Funcs8Args<>();
@@ -234,5 +364,15 @@ class FunctionalUtilsTest {
         );
         assertEquals(defaultValue, string[0]);
         assertEquals(defaultValue, returnValue);
+    }
+
+    @Test
+    void funcs8ArgsInvokeNonNullWithNull() {
+        Funcs8Args<String, String, String, String, String, String, String, String, String> funcs8Args = new Funcs8Args<>();
+        String returnValue = FunctionalUtils.invokeNonNull(
+                funcs8Args,
+                null, null, null, null, null, null, null, null
+        );
+        assertNull(returnValue);
     }
 }
