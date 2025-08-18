@@ -4,7 +4,7 @@ public final class Actions
         extends Multicast<Action>
         implements Action {
     @Override
-    public synchronized void invoke() {
+    public void invoke() {
         for (Action action : this) {
             action.invoke();
         }

@@ -6,36 +6,34 @@ import org.openjdk.jol.info.GraphLayout;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class MulticastTest {
     @Test
-    void invokeMultiThreadSafe() {
-        final String[] result = {""};
+    void invokeMultiThreadSafe() throws InterruptedException {
+        final int threadCount = 16;
+        final int actionCount = 5;
+        final AtomicInteger counter = new AtomicInteger(0);
+
         Actions actions = new Actions();
-        actions.add(() -> result[0] += "1");
-        actions.add(() -> result[0] += "2");
-        actions.add(() -> result[0] += "3");
-        actions.add(() -> result[0] += "4");
-        actions.add(() -> result[0] += "5");
+        for (int i = 0; i < actionCount; i++) {
+            actions.add(counter::incrementAndGet);
+        }
+
         List<Thread> threads = new ArrayList<>();
-        for (int i = 0; i < 16; i++) {
+        for (int i = 0; i < threadCount; i++) {
             threads.add(new Thread(actions::invoke));
         }
         for (Thread thread : threads) {
             thread.start();
         }
-        StringBuilder expected = new StringBuilder();
-        for (int i = 0; i < 16; i++) {
-            expected.append("12345");
+        for (Thread thread : threads) {
+            thread.join();
         }
-        while (true) {
-            if (threads.stream().noneMatch(Thread::isAlive)) {
-                assertEquals(expected.toString(), result[0]);
-                return;
-            }
-        }
+
+        assertEquals(threadCount * actionCount, counter.get());
     }
 
     @Test
