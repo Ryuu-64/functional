@@ -46,7 +46,7 @@ class MulticastTest {
         actions1.add(() -> stringBuilder.append(1));
         actions1.add(() -> stringBuilder.append(2));
         actions1.invoke();
-        assertEquals(stringBuilder.toString(), "012");
+        assertEquals("012", stringBuilder.toString());
 
         stringBuilder.delete(0, stringBuilder.length());
         Actions actions2 = new Actions();
@@ -54,12 +54,12 @@ class MulticastTest {
         actions2.add(() -> stringBuilder.append(1));
         actions2.add(() -> stringBuilder.append(2));
         actions2.invoke();
-        assertEquals(stringBuilder.toString(), "012");
+        assertEquals("012", stringBuilder.toString());
 
         stringBuilder.delete(0, stringBuilder.length());
         actions1.add(actions2);
         actions1.invoke();
-        assertEquals(stringBuilder.toString(), "012012");
+        assertEquals("012012", stringBuilder.toString());
     }
 
     @Test
@@ -81,14 +81,14 @@ class MulticastTest {
     void addNull() {
         Actions actions = new Actions();
         assertFalse(actions.add(null));
-        assertEquals(actions.count(), 0);
+        assertEquals(0, actions.count());
     }
 
     @SuppressWarnings("UnnecessaryBoxing")
     @Test
     void addContravariantUnicast() {
         Func<Number> func = () -> Double.valueOf(1);
-        assertEquals(func.invoke(), 1.0d);
+        assertEquals(1.0d, func.invoke());
     }
 
     @Test
@@ -145,7 +145,7 @@ class MulticastTest {
     void removeNull() {
         Actions actions = new Actions();
         assertFalse(actions.remove(null));
-        assertEquals(actions.count(), 0);
+        assertEquals(0, actions.count());
     }
 
     @Test
@@ -222,7 +222,7 @@ class MulticastTest {
         actions.add(actions::clear);
         actions.add(() -> stringBuilder.append(2));
         actions.invoke();
-        assertEquals(stringBuilder.toString(), "01");
+        assertEquals("01", stringBuilder.toString());
     }
 
     @Test
@@ -246,12 +246,12 @@ class MulticastTest {
         for (Action act : functionalList) {
             act.invoke();
         }
-        assertEquals(stringBuilder.toString(), "01234");
+        assertEquals("01234", stringBuilder.toString());
         stringBuilder.delete(0, stringBuilder.length());
 
         // copy list remove
         functionalList.clear();
-        assertEquals(stringBuilder.toString(), "");
+        assertEquals("", stringBuilder.toString());
 
         stringBuilder.delete(0, stringBuilder.length());
         // copy list add
@@ -262,12 +262,12 @@ class MulticastTest {
         for (Action act : functionalList) {
             act.invoke();
         }
-        assertEquals(stringBuilder.toString(), "01234");
+        assertEquals("01234", stringBuilder.toString());
 
         stringBuilder.delete(0, stringBuilder.length());
         actions.invoke();
         // origin functional list will not change
-        assertEquals(stringBuilder.toString(), "01234");
+        assertEquals("01234", stringBuilder.toString());
     }
 
     @Test

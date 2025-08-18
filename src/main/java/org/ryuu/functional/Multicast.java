@@ -6,8 +6,29 @@ import java.util.List;
 import java.util.Objects;
 
 abstract class Multicast<F extends Unicast> implements Unicast, Iterable<F> {
+    private class SharedIterator<E extends Unicast> implements Iterator<E> {
+        private int cursor;
+
+        private void reset() {
+            cursor = 0;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return cursor != Multicast.this.unicastList.size();
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public E next() {
+            E next = (E) Multicast.this.unicastList.get(cursor);
+            cursor++;
+            return next;
+        }
+    }
+
     protected final List<F> unicastList = new ArrayList<>();
-    protected SharedIterator<F> iterator = new SharedIterator<>();
+    private final SharedIterator<F> iterator = new SharedIterator<>();
 
     @SuppressWarnings("unchecked")
     public final boolean add(F functional) {
@@ -146,26 +167,5 @@ abstract class Multicast<F extends Unicast> implements Unicast, Iterable<F> {
     @Override
     public int hashCode() {
         return Objects.hash(unicastList);
-    }
-
-    private class SharedIterator<E extends Unicast> implements Iterator<E> {
-        private int cursor;
-
-        private void reset() {
-            cursor = 0;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return cursor != Multicast.this.unicastList.size();
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public E next() {
-            E next = (E) Multicast.this.unicastList.get(cursor);
-            cursor++;
-            return next;
-        }
     }
 }

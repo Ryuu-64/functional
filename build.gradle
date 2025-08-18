@@ -2,12 +2,13 @@ plugins {
     id 'java'
 }
 
-group 'org.ryuu'
-version '1.1.1'
+group = 'org.ryuu'
+version = '1.1.2'
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(8)
+    }
 }
 
 repositories {
@@ -16,15 +17,17 @@ repositories {
 
 dependencies {
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.13.4'
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.3'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.13.4'
+    // https://mvnrepository.com/artifact/org.junit.platform/junit-platform-launcher
+    testImplementation "org.junit.platform:junit-platform-launcher:1.13.4"
     // https://mvnrepository.com/artifact/org.openjdk.jol/jol-core
     testImplementation 'org.openjdk.jol:jol-core:0.17'
     // https://mvnrepository.com/artifact/org.openjdk.jmh/jmh-core
-    testImplementation 'org.openjdk.jmh:jmh-core:1.36'
+    testImplementation 'org.openjdk.jmh:jmh-core:1.37'
     // https://mvnrepository.com/artifact/org.openjdk.jmh/jmh-generator-annprocess
-    testAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.36'
+    testAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.37'
 }
 
 test {
