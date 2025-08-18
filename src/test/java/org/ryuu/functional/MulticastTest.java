@@ -80,7 +80,7 @@ class MulticastTest {
     @Test
     void addNull() {
         Actions actions = new Actions();
-        assertFalse(actions.add(null));
+        actions.add(null);
         assertEquals(0, actions.count());
     }
 
@@ -103,12 +103,12 @@ class MulticastTest {
         actions.invoke();
         assertEquals("0", stringBuilder.toString());
 
-        assertTrue(actions.remove(action));
+        actions.remove(action);
 
         actions.invoke();
         assertEquals("0", stringBuilder.toString());
 
-        assertFalse(actions.remove(action));
+        actions.remove(action);
     }
 
     @Test
@@ -134,8 +134,8 @@ class MulticastTest {
         actions2.add(action4);
         actions2.add(action3);
 
-        assertTrue(actions1.remove(actions2));
-        assertFalse(actions1.remove(actions2));
+        actions1.remove(actions2);
+        actions1.remove(actions2);
 
         actions1.invoke();
         assertEquals("012", stringBuilder.toString());
@@ -144,7 +144,7 @@ class MulticastTest {
     @Test
     void removeNull() {
         Actions actions = new Actions();
-        assertFalse(actions.remove(null));
+        actions.remove(null);
         assertEquals(0, actions.count());
     }
 
@@ -336,12 +336,11 @@ class MulticastTest {
         assertEquals(8 + 4 + 4, classLayout.instanceSize());
         GraphLayout graphLayout = GraphLayout.parseInstance(actions);
         //org.ryuu.functional.Actions@239a307bd object externals:
-        //          ADDRESS       SIZE TYPE                        PATH                           VALUE
-        //         f5586de8         16 [Ljava.lang.Object;         .unicastList.elementData       []
-        //         f5586df8   65503864 (something else)            (somewhere else)               (something else)
-        //         f93ff070         16 org.ryuu.functional.Actions                                (object)
-        //         f93ff080         24 java.util.ArrayList         .unicastList                   (object)
+        //          ADDRESS       SIZE TYPE                            PATH                           VALUE
+        //         f55870e8         16 java.util.Collections$EmptyList .unicastList                   (object)
+        //         f55870f8   65503432 (something else)                (somewhere else)               (something else)
+        //         f93ff1c0         16 org.ryuu.functional.Actions                                    (object)
         System.out.println(graphLayout.toPrintable());
-        assertEquals(16 + 16 + 24, graphLayout.totalSize());
+        assertEquals(16 + 16, graphLayout.totalSize());
     }
 }

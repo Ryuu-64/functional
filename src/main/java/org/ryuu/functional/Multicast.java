@@ -1,32 +1,33 @@
 package org.ryuu.functional;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 abstract class Multicast<F extends Unicast> implements Unicast, Iterable<F> {
-    protected final List<F> unicastList = new ArrayList<>();
+    protected List<F> unicastList = Collections.emptyList();
 
     @SuppressWarnings("unchecked")
-    public final boolean add(F functional) {
+    public final void add(F functional) {
         if (functional == null) {
-            return false;
-        } else if (functional instanceof Multicast) {
-            return addMulticast((Multicast<F>) functional);
+            return;
+        }
+
+        if (functional instanceof Multicast) {
+            addMulticast((Multicast<F>) functional);
         } else /* if (functional instanceof Unicast) */ {
-            return addUnicast(functional);
+            addUnicast(functional);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public final boolean remove(F functional) {
+    public final void remove(F functional) {
         if (functional == null) {
-            return false;
-        } else if (functional instanceof Multicast) {
-            return removeMulticast((Multicast<F>) functional);
+            return;
+        }
+
+        if (functional instanceof Multicast) {
+            removeMulticast((Multicast<F>) functional);
         } else /* if (functional instanceof Unicast) */ {
-            return removeUnicast(functional);
+            removeUnicast(functional);
         }
     }
 
@@ -42,7 +43,7 @@ abstract class Multicast<F extends Unicast> implements Unicast, Iterable<F> {
     }
 
     public final void clear() {
-        unicastList.clear();
+        unicastList = Collections.emptyList();
     }
 
     public final int count() {
@@ -53,34 +54,44 @@ abstract class Multicast<F extends Unicast> implements Unicast, Iterable<F> {
         return new ArrayList<>(unicastList);
     }
 
-    private boolean addUnicast(F unicast) {
-        return unicastList.add(unicast);
+    private void addUnicast(F unicast) {
+        List<F> newList = new ArrayList<>(unicastList);
+        newList.add(unicast);
+        unicastList = Collections.unmodifiableList(newList);
     }
 
-    private boolean addMulticast(Multicast<F> multicast) {
-        boolean isAdd = false;
-        for (F unicast : multicast.unicastList) {
-            isAdd = addUnicast(unicast);
+    private void addMulticast(Multicast<F> multicast) {
+        if (multicast.unicastList.isEmpty()) {
+            return;
         }
-        return isAdd;
+
+        List<F> newList = new ArrayList<>(unicastList);
+        newList.addAll(multicast.unicastList);
+        unicastList = Collections.unmodifiableList(newList);
     }
 
-    private boolean removeUnicast(F unicast) {
-        return unicastList.remove(unicast);
+    private void removeUnicast(F unicast) {
+        if (!unicastList.contains(unicast)) {
+            return;
+        }
+
+        List<F> newList = new ArrayList<>(unicastList);
+        newList.remove(unicast);
+        unicastList = Collections.unmodifiableList(newList);
     }
 
-    private boolean removeMulticast(Multicast<F> multicast) {
+    private void removeMulticast(Multicast<F> multicast) {
         int sourceCount = count();
         int targetCount = multicast.count();
 
         for (int i = sourceCount - targetCount; i >= 0; i--) {
             if (equal(multicast.unicastList, i, targetCount)) {
-                delete(unicastList, i, targetCount);
-                return true;
+                List<F> newList = new ArrayList<>(unicastList);
+                newList.subList(i, i + targetCount).clear();
+                unicastList = Collections.unmodifiableList(newList);
+                return;
             }
         }
-
-        return false;
     }
 
     private boolean containsUnicast(F unicast) {
@@ -109,14 +120,9 @@ abstract class Multicast<F extends Unicast> implements Unicast, Iterable<F> {
         return true;
     }
 
-    private void delete(List<F> unicastList, int start, int count) {
-        unicastList.subList(start, start + count).clear();
-    }
-
     @Override
     public Iterator<F> iterator() {
-        List<F> snapshot = new ArrayList<>(unicastList);
-        return snapshot.iterator();
+        return unicastList.iterator();
     }
 
     @Override
@@ -124,9 +130,11 @@ abstract class Multicast<F extends Unicast> implements Unicast, Iterable<F> {
         if (this == obj) {
             return true;
         }
+
         if (!(obj instanceof Multicast<?>)) {
             return false;
         }
+
         Multicast<?> multicast = (Multicast<?>) obj;
         return unicastList.equals(multicast.unicastList);
     }
