@@ -222,7 +222,7 @@ class MulticastTest {
         actions.add(actions::clear);
         actions.add(() -> stringBuilder.append(2));
         actions.invoke();
-        assertEquals("01", stringBuilder.toString());
+        assertEquals("012", stringBuilder.toString());
     }
 
     @Test
@@ -324,41 +324,24 @@ class MulticastTest {
     @Test
     void javaObjectLayout() {
         Actions actions = new Actions();
-/*
-org.ryuu.functional.Actions object internals:
-OFF  SZ                                           TYPE DESCRIPTION               VALUE
-  0   8                                                (object header: mark)     0x0000000000000001 (non-biasable; age: 0)
-  8   4                                                (object header: class)    0x20044100
- 12   4                                 java.util.List Multicast.unicastList     (object)
- 16   4   org.ryuu.functional.Multicast.SharedIterator Multicast.iterator        (object)
- 20   4                                                (object alignment gap)
-Instance size: 24 bytes
-Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
-*/
         ClassLayout classLayout = ClassLayout.parseInstance(actions);
-        assertEquals(8 + 4 + 4 + 4 + 4, classLayout.instanceSize());
+        //org.ryuu.functional.Actions object internals:
+        //OFF  SZ             TYPE DESCRIPTION               VALUE
+        //  0   8                  (object header: mark)     0x0000000000000001 (non-biasable; age: 0)
+        //  8   4                  (object header: class)    0x20041f76
+        // 12   4   java.util.List Multicast.unicastList     (object)
+        //Instance size: 16 bytes
+        //Space losses: 0 bytes internal + 0 bytes external = 0 bytes total
         System.out.println(classLayout.toPrintable());
-
-/*
-org.ryuu.functional.Actions@4189d70bd object externals:
-SIZE TYPE                                         PATH                           VALUE
-  16 [Ljava.lang.Object;                          .unicastList.elementData       []
-  24 org.ryuu.functional.Actions                                                 (object)
-  24 java.util.ArrayList                          .unicastList                   (object)
-  24 org.ryuu.functional.Multicast$SharedIterator .iterator                      (object)
-
-org.ryuu.functional.Multicast$SharedIterator object internals:
-OFF  SZ                            TYPE DESCRIPTION               VALUE
-  0   8                                 (object header: mark)     0x00000058fe049901 (hash: 0x58fe0499; age: 0)
-  8   4                                 (object header: class)    0x20044156
- 12   4                             int SharedIterator.cursor     0
- 16   4   org.ryuu.functional.Multicast SharedIterator.this$0     (object)
- 20   4                                 (object alignment gap)
-Instance size: 24 bytes
-Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
-*/
+        assertEquals(8 + 4 + 4, classLayout.instanceSize());
         GraphLayout graphLayout = GraphLayout.parseInstance(actions);
-        assertEquals(16 + 24 + 24 + 24, graphLayout.totalSize());
+        //org.ryuu.functional.Actions@239a307bd object externals:
+        //          ADDRESS       SIZE TYPE                        PATH                           VALUE
+        //         f5586de8         16 [Ljava.lang.Object;         .unicastList.elementData       []
+        //         f5586df8   65503864 (something else)            (somewhere else)               (something else)
+        //         f93ff070         16 org.ryuu.functional.Actions                                (object)
+        //         f93ff080         24 java.util.ArrayList         .unicastList                   (object)
         System.out.println(graphLayout.toPrintable());
+        assertEquals(16 + 16 + 24, graphLayout.totalSize());
     }
 }

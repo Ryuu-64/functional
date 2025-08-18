@@ -6,29 +6,7 @@ import java.util.List;
 import java.util.Objects;
 
 abstract class Multicast<F extends Unicast> implements Unicast, Iterable<F> {
-    private class SharedIterator<E extends Unicast> implements Iterator<E> {
-        private int cursor;
-
-        private void reset() {
-            cursor = 0;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return cursor != Multicast.this.unicastList.size();
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public E next() {
-            E next = (E) Multicast.this.unicastList.get(cursor);
-            cursor++;
-            return next;
-        }
-    }
-
     protected final List<F> unicastList = new ArrayList<>();
-    private final SharedIterator<F> iterator = new SharedIterator<>();
 
     @SuppressWarnings("unchecked")
     public final boolean add(F functional) {
@@ -65,7 +43,6 @@ abstract class Multicast<F extends Unicast> implements Unicast, Iterable<F> {
 
     public final void clear() {
         unicastList.clear();
-        iterator.reset();
     }
 
     public final int count() {
@@ -89,15 +66,7 @@ abstract class Multicast<F extends Unicast> implements Unicast, Iterable<F> {
     }
 
     private boolean removeUnicast(F unicast) {
-        int index = unicastList.indexOf(unicast);
-        if (index == -1) {
-            return false;
-        } else {
-            if (index < iterator.cursor) {
-                iterator.cursor--;
-            }
-            return unicastList.remove(unicast);
-        }
+        return unicastList.remove(unicast);
     }
 
     private boolean removeMulticast(Multicast<F> multicast) {
@@ -141,15 +110,13 @@ abstract class Multicast<F extends Unicast> implements Unicast, Iterable<F> {
     }
 
     private void delete(List<F> unicastList, int start, int count) {
-        for (int i = 0; i < count; i++) {
-            unicastList.remove(start);
-        }
+        unicastList.subList(start, start + count).clear();
     }
 
     @Override
     public Iterator<F> iterator() {
-        iterator.reset();
-        return iterator;
+        List<F> snapshot = new ArrayList<>(unicastList);
+        return snapshot.iterator();
     }
 
     @Override
