@@ -1,7 +1,7 @@
 package org.ryuu.functional;
 
 public final class Funcs<TResult>
-        extends Multicast<Func<TResult>>
+        extends MulticastDelegate<Func<TResult>>
         implements Func<TResult> {
     @Override
     public TResult invoke() {

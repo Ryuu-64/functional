@@ -1,7 +1,7 @@
 package org.ryuu.functional;
 
 public final class EventHandlers<TSender, TEventArgs extends EventArgs>
-        extends Multicast<EventHandler<TSender, TEventArgs>>
+        extends MulticastDelegate<EventHandler<TSender, TEventArgs>>
         implements EventHandler<TSender, TEventArgs> {
     @Override
     public void invoke(TSender sender, TEventArgs args) {

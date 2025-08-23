@@ -1,6 +1,6 @@
 package org.ryuu.functional;
 
 @FunctionalInterface
-public interface Func<TResult> extends Unicast {
+public interface Func<TResult> extends Delegate {
     TResult invoke();
 }

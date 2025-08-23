@@ -1,7 +1,7 @@
 package org.ryuu.functional;
 
 public final class Actions1Arg<T>
-        extends Multicast<Action1Arg<T>>
+        extends MulticastDelegate<Action1Arg<T>>
         implements Action1Arg<T> {
     @Override
     public void invoke(T arg) {

@@ -1,7 +1,7 @@
 package org.ryuu.functional;
 
 public final class Funcs2Args<T1, T2, TResult>
-        extends Multicast<Func2Args<T1, T2, TResult>>
+        extends MulticastDelegate<Func2Args<T1, T2, TResult>>
         implements Func2Args<T1, T2, TResult> {
     @Override
     public TResult invoke(T1 arg1, T2 arg2) {

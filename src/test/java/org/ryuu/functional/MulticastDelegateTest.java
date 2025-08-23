@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MulticastTest {
+class MulticastDelegateTest {
     @Test
     void invokeMultiThreadSafe() throws InterruptedException {
         final int threadCount = 16;
@@ -233,31 +233,31 @@ class MulticastTest {
     }
 
     @Test
-    void getFunctionalList() {
+    void getDelegates() {
         Actions actions = new Actions();
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < 5; i++) {
             int finalI = i;
             actions.add(() -> stringBuilder.append(finalI));
         }
-        List<Action> functionalList = actions.getUnicastList();
-        for (Action act : functionalList) {
+        List<Action> delegates = actions.getDelegates();
+        for (Action act : delegates) {
             act.invoke();
         }
         assertEquals("01234", stringBuilder.toString());
         stringBuilder.delete(0, stringBuilder.length());
 
         // copy list remove
-        functionalList.clear();
+        delegates.clear();
         assertEquals("", stringBuilder.toString());
 
         stringBuilder.delete(0, stringBuilder.length());
         // copy list add
         for (int i = 0; i < 5; i++) {
             int finalI = i;
-            functionalList.add(() -> stringBuilder.append(finalI));
+            delegates.add(() -> stringBuilder.append(finalI));
         }
-        for (Action act : functionalList) {
+        for (Action act : delegates) {
             act.invoke();
         }
         assertEquals("01234", stringBuilder.toString());
@@ -324,21 +324,26 @@ class MulticastTest {
         Actions actions = new Actions();
         ClassLayout classLayout = ClassLayout.parseInstance(actions);
         //org.ryuu.functional.Actions object internals:
-        //OFF  SZ             TYPE DESCRIPTION               VALUE
-        //  0   8                  (object header: mark)     0x0000000000000001 (non-biasable; age: 0)
-        //  8   4                  (object header: class)    0x20041f76
-        // 12   4   java.util.List Multicast.unicastList     (object)
-        //Instance size: 16 bytes
-        //Space losses: 0 bytes internal + 0 bytes external = 0 bytes total
+        //OFF  SZ               TYPE DESCRIPTION                       VALUE
+        //  0   8                    (object header: mark)             0x0000000000000001 (non-biasable; age: 0)
+        //  8   4                    (object header: class)            0x20041f75
+        // 12   4   java.lang.Object MulticastDelegate.delegatesLock   (object)
+        // 16   4     java.util.List MulticastDelegate.delegates       (object)
+        // 20   4                    (object alignment gap)
+        //Instance size: 24 bytes
+        //Space losses: 0 bytes internal + 4 bytes external = 4 bytes total
         System.out.println(classLayout.toPrintable());
-        assertEquals(8 + 4 + 4, classLayout.instanceSize());
+        assertEquals(8 + 4 + 4 + 4 + 4, classLayout.instanceSize());
         GraphLayout graphLayout = GraphLayout.parseInstance(actions);
-        //org.ryuu.functional.Actions@239a307bd object externals:
+        //org.ryuu.functional.Actions@5a59ca5ed object externals:
         //          ADDRESS       SIZE TYPE                            PATH                           VALUE
-        //         f55870e8         16 java.util.Collections$EmptyList .unicastList                   (object)
-        //         f55870f8   65503432 (something else)                (somewhere else)               (something else)
-        //         f93ff1c0         16 org.ryuu.functional.Actions                                    (object)
+        //         f5587638         16 java.util.Collections$EmptyList .delegates                     (object)
+        //         f5587648   65177016 (something else)                (somewhere else)               (something else)
+        //         f93afc00         24 org.ryuu.functional.Actions                                    (object)
+        //         f93afc18         16 java.lang.Object                .delegatesLock                 (object)
+        //
+        //Addresses are stable after 1 tries.
         System.out.println(graphLayout.toPrintable());
-        assertEquals(16 + 16, graphLayout.totalSize());
+        assertEquals(16 + 24 + 16, graphLayout.totalSize());
     }
 }
