@@ -2,9 +2,14 @@ package org.ryuu.functional;
 
 import java.util.*;
 
-abstract class MulticastDelegate<F extends Delegate> implements Delegate, Iterable<F> {
+public abstract class MulticastDelegate<F extends Delegate> implements Iterable<F>, Delegate, Event<F> {
+    private final boolean isEvent;
     private final Object delegatesLock = new Object();
     private List<F> delegates = Collections.emptyList();
+
+    public MulticastDelegate(boolean isEvent) {
+        this.isEvent = isEvent;
+    }
 
     @Override
     public final Iterator<F> iterator() {
@@ -30,38 +35,32 @@ abstract class MulticastDelegate<F extends Delegate> implements Delegate, Iterab
         return Objects.hash(delegates);
     }
 
-    public final void add(F functional) {
-        synchronized (delegatesLock) {
-            addInternal(functional);
+    @Override
+    public final void add(F delegate) {
+        if (isEvent) {
+            addSync(delegate);
+        } else {
+            addAsync(delegate);
         }
     }
 
-    public final void remove(F functional) {
-        synchronized (delegatesLock) {
-            removeInternal(functional);
-        }
-    }
-
-    public final void addAsync(F functional) {
-        synchronized (delegatesLock) {
-            addInternal(functional);
-        }
-    }
-
-    public final void removeAsync(F functional) {
-        synchronized (delegatesLock) {
-            removeInternal(functional);
+    @Override
+    public final void remove(F delegate) {
+        if (isEvent) {
+            removeSync(delegate);
+        } else {
+            removeAsync(delegate);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public final boolean contains(F functional) {
-        if (functional == null) {
+    public final boolean contains(F delegate) {
+        if (delegate == null) {
             return false;
-        } else if (functional instanceof MulticastDelegate) {
-            return containsMulticast((MulticastDelegate<F>) functional);
-        } else /* if (functional instanceof Delegate) */ {
-            return containsUnicast(functional);
+        } else if (delegate instanceof MulticastDelegate) {
+            return containsMulticast((MulticastDelegate<F>) delegate);
+        } else /* if (delegate instanceof Delegate) */ {
+            return containsUnicast(delegate);
         }
     }
 
@@ -77,29 +76,49 @@ abstract class MulticastDelegate<F extends Delegate> implements Delegate, Iterab
         return new ArrayList<>(delegates);
     }
 
+    private void addSync(F delegate) {
+        synchronized (delegatesLock) {
+            addInternal(delegate);
+        }
+    }
+
+    private void removeSync(F delegate) {
+        synchronized (delegatesLock) {
+            removeInternal(delegate);
+        }
+    }
+
+    private void addAsync(F delegate) {
+        addInternal(delegate);
+    }
+
+    private void removeAsync(F delegate) {
+        removeInternal(delegate);
+    }
+
     @SuppressWarnings("unchecked")
-    private void removeInternal(F functional) {
-        if (functional == null) {
+    private void removeInternal(F delegate) {
+        if (delegate == null) {
             return;
         }
 
-        if (functional instanceof MulticastDelegate) {
-            removeMulticast((MulticastDelegate<F>) functional);
-        } else /* if (functional instanceof Delegate) */ {
-            removeUnicast(functional);
+        if (delegate instanceof MulticastDelegate) {
+            removeMulticast((MulticastDelegate<F>) delegate);
+        } else /* if (delegate instanceof Delegate) */ {
+            removeUnicast(delegate);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private void addInternal(F functional) {
-        if (functional == null) {
+    private void addInternal(F delegate) {
+        if (delegate == null) {
             return;
         }
 
-        if (functional instanceof MulticastDelegate) {
-            addMulticast((MulticastDelegate<F>) functional);
-        } else /* if (functional instanceof Delegate) */ {
-            addUnicast(functional);
+        if (delegate instanceof MulticastDelegate) {
+            addMulticast((MulticastDelegate<F>) delegate);
+        } else /* if (delegate instanceof Delegate) */ {
+            addUnicast(delegate);
         }
     }
 

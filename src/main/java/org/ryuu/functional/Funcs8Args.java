@@ -3,6 +3,18 @@ package org.ryuu.functional;
 public final class Funcs8Args<T1, T2, T3, T4, T5, T6, T7, T8, TResult>
         extends MulticastDelegate<Func8Args<T1, T2, T3, T4, T5, T6, T7, T8, TResult>>
         implements Func8Args<T1, T2, T3, T4, T5, T6, T7, T8, TResult> {
+    private Funcs8Args(boolean isEvent) {
+        super(isEvent);
+    }
+
+    public static <T1, T2, T3, T4, T5, T6, T7, T8, TResult> Funcs8Args<T1, T2, T3, T4, T5, T6, T7, T8, TResult> delegate() {
+        return new Funcs8Args<>(false);
+    }
+
+    public static <T1, T2, T3, T4, T5, T6, T7, T8, TResult> Funcs8Args<T1, T2, T3, T4, T5, T6, T7, T8, TResult> event() {
+        return new Funcs8Args<>(true);
+    }
+
     @Override
     public TResult invoke(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8) {
         TResult result = null;

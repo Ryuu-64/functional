@@ -17,7 +17,7 @@ public class BenchMark {
     @Setup
     public void setUp() {
         result = new AtomicInteger();
-        actions = new Actions();
+        actions = Actions.event();
         actions.add(result::incrementAndGet);
     }
 
@@ -36,10 +36,12 @@ public class BenchMark {
                 .include(BenchMark.class.getName())
                 .mode(Mode.AverageTime)
                 .timeUnit(TimeUnit.NANOSECONDS)
+                .warmupIterations(5)
+                .measurementIterations(5)
+                .forks(1)
                 .shouldFailOnError(true)
                 .shouldDoGC(true)
                 .build();
-
         new Runner(options).run();
     }
 }

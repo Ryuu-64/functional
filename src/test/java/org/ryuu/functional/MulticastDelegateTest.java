@@ -6,18 +6,66 @@ import org.openjdk.jol.info.GraphLayout;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class MulticastDelegateTest {
     @Test
+    void testEventThreadSafety() throws InterruptedException {
+        Actions actions = Actions.event();
+
+        int threadCount = 128;
+        int opsPerThread = 100_000;
+
+        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        Action action = () -> {};
+
+        System.out.println("=== Before test ===");
+        System.out.println(ClassLayout.parseInstance(actions).toPrintable());
+
+        for (int i = 0; i < threadCount; i++) {
+            executor.submit(() -> {
+                for (int j = 0; j < opsPerThread; j++) {
+                    actions.add(action);
+                    actions.remove(action);
+
+                    // 只在某些迭代里打印，避免刷爆日志
+                    if (j % 50_000 == 0) {
+                        synchronized (actions) {
+                            System.out.println(Thread.currentThread().getName() + " holds lock:");
+                            System.out.println(ClassLayout.parseInstance(actions).toPrintable());
+                        }
+                    }
+                }
+                latch.countDown();
+            });
+        }
+
+        latch.await();
+        executor.shutdown();
+
+        System.out.println("=== After test ===");
+        System.out.println(ClassLayout.parseInstance(actions).toPrintable());
+
+        // 触发一次调用，验证不会出并发异常
+        actions.invoke();
+        List<Action> delegates = actions.getDelegates();
+        assertEquals(0, delegates.size());
+    }
+
+    @Test
     void invokeMultiThreadSafe() throws InterruptedException {
         final int threadCount = 16;
         final int actionCount = 5;
         final AtomicInteger counter = new AtomicInteger(0);
 
-        Actions actions = new Actions();
+        Actions actions = Actions.delegate();
         for (int i = 0; i < actionCount; i++) {
             actions.add(counter::incrementAndGet);
         }
@@ -39,7 +87,7 @@ class MulticastDelegateTest {
     @Test
     void addUnicast() {
         StringBuilder stringBuilder = new StringBuilder();
-        Actions actions1 = new Actions();
+        Actions actions1 = Actions.delegate();
         actions1.add(() -> stringBuilder.append(0));
         actions1.add(() -> stringBuilder.append(1));
         actions1.add(() -> stringBuilder.append(2));
@@ -47,7 +95,7 @@ class MulticastDelegateTest {
         assertEquals("012", stringBuilder.toString());
 
         stringBuilder.delete(0, stringBuilder.length());
-        Actions actions2 = new Actions();
+        Actions actions2 = Actions.delegate();
         actions2.add(() -> stringBuilder.append(0));
         actions2.add(() -> stringBuilder.append(1));
         actions2.add(() -> stringBuilder.append(2));
@@ -63,10 +111,10 @@ class MulticastDelegateTest {
     @Test
     void addMulticast() {
         final int[] res = {0};
-        Actions actions1 = new Actions();
+        Actions actions1 = Actions.delegate();
         actions1.add(() -> res[0]++);
 
-        Actions actions2 = new Actions();
+        Actions actions2 = Actions.delegate();
         actions2.add(actions1);
 
         actions1.add(() -> res[0]++);
@@ -77,7 +125,7 @@ class MulticastDelegateTest {
 
     @Test
     void addNull() {
-        Actions actions = new Actions();
+        Actions actions = Actions.delegate();
         actions.add(null);
         assertEquals(0, actions.count());
     }
@@ -92,7 +140,7 @@ class MulticastDelegateTest {
     @Test
     void removeUnicast() {
         StringBuilder stringBuilder = new StringBuilder();
-        Actions actions = new Actions();
+        Actions actions = Actions.delegate();
 
         Action action = () -> stringBuilder.append(0);
 
@@ -112,8 +160,8 @@ class MulticastDelegateTest {
     @Test
     void removeMulticast() {
         StringBuilder stringBuilder = new StringBuilder();
-        Actions actions1 = new Actions();
-        Actions actions2 = new Actions();
+        Actions actions1 = Actions.delegate();
+        Actions actions2 = Actions.delegate();
 
         Action action0 = () -> stringBuilder.append(0);
         Action action1 = () -> stringBuilder.append(1);
@@ -141,14 +189,14 @@ class MulticastDelegateTest {
 
     @Test
     void removeNull() {
-        Actions actions = new Actions();
+        Actions actions = Actions.delegate();
         actions.remove(null);
         assertEquals(0, actions.count());
     }
 
     @Test
     void containsUnicast() {
-        Actions actions1 = new Actions();
+        Actions actions1 = Actions.delegate();
 
         Action action0 = () -> {
         };
@@ -163,8 +211,8 @@ class MulticastDelegateTest {
 
     @Test
     void containsMulticast() {
-        Actions actions1 = new Actions();
-        Actions actions2 = new Actions();
+        Actions actions1 = Actions.delegate();
+        Actions actions2 = Actions.delegate();
 
         Action action0 = () -> {
         };
@@ -196,14 +244,14 @@ class MulticastDelegateTest {
 
     @Test
     void containsNull() {
-        Actions actions = new Actions();
+        Actions actions = Actions.delegate();
         assertFalse(actions.contains(null));
     }
 
     @Test
     void clear() {
         StringBuilder stringBuilder = new StringBuilder();
-        Actions actions = new Actions();
+        Actions actions = Actions.delegate();
         actions.add(() -> stringBuilder.append(0));
         actions.add(() -> stringBuilder.append(1));
         actions.clear();
@@ -214,7 +262,7 @@ class MulticastDelegateTest {
     @Test
     void cleanTheMulticastInTheMulticast() {
         StringBuilder stringBuilder = new StringBuilder();
-        Actions actions = new Actions();
+        Actions actions = Actions.delegate();
         actions.add(() -> stringBuilder.append(0));
         actions.add(() -> stringBuilder.append(1));
         actions.add(actions::clear);
@@ -225,7 +273,7 @@ class MulticastDelegateTest {
 
     @Test
     void count() {
-        Actions actions = new Actions();
+        Actions actions = Actions.delegate();
         assertEquals(0, actions.count());
         actions.add(() -> {
         });
@@ -234,7 +282,7 @@ class MulticastDelegateTest {
 
     @Test
     void getDelegates() {
-        Actions actions = new Actions();
+        Actions actions = Actions.delegate();
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < 5; i++) {
             int finalI = i;
@@ -271,7 +319,7 @@ class MulticastDelegateTest {
     @Test
     void iterator() {
         final int[] res = {0};
-        Actions actions = new Actions();
+        Actions actions = Actions.delegate();
         actions.add(() -> res[0]++);
         actions.add(() -> res[0]++);
         actions.add(() -> res[0]++);
@@ -288,8 +336,8 @@ class MulticastDelegateTest {
         Action println1 = () -> System.out.println(1);
         Action println2 = () -> System.out.println(2);
 
-        Actions actions1 = new Actions();
-        Actions actions2 = new Actions();
+        Actions actions1 = Actions.delegate();
+        Actions actions2 = Actions.delegate();
 
         actions1.add(println1);
         actions1.add(println2);
@@ -307,8 +355,8 @@ class MulticastDelegateTest {
     void testHashCode() {
         Action println1 = () -> System.out.println(1);
         Action println2 = () -> System.out.println(2);
-        Actions actions1 = new Actions();
-        Actions actions2 = new Actions();
+        Actions actions1 = Actions.delegate();
+        Actions actions2 = Actions.delegate();
         actions1.add(println1);
         actions1.add(println2);
         actions2.add(println1);
@@ -321,7 +369,7 @@ class MulticastDelegateTest {
 
     @Test
     void javaObjectLayout() {
-        Actions actions = new Actions();
+        Actions actions = Actions.delegate();
         ClassLayout classLayout = ClassLayout.parseInstance(actions);
         //org.ryuu.functional.Actions object internals:
         //OFF  SZ               TYPE DESCRIPTION                       VALUE

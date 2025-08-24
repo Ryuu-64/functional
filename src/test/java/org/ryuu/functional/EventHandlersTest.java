@@ -15,7 +15,7 @@ class EventHandlersTest {
 
     @Test
     void testInvokeMultipleHandlers() {
-        EventHandlers<String, MyEventArgs> handlers = new EventHandlers<>();
+        EventHandlers<String, MyEventArgs> handlers = EventHandlers.delegate();
 
         StringBuilder log = new StringBuilder();
 
@@ -34,7 +34,7 @@ class EventHandlersTest {
 
     @Test
     void testRemoveHandler() {
-        EventHandlers<String, MyEventArgs> handlers = new EventHandlers<>();
+        EventHandlers<String, MyEventArgs> handlers = EventHandlers.delegate();
 
         StringBuilder log = new StringBuilder();
 
@@ -54,7 +54,7 @@ class EventHandlersTest {
 
     @Test
     void testEmptyHandlers() {
-        EventHandlers<String, MyEventArgs> handlers = new EventHandlers<>();
+        EventHandlers<String, MyEventArgs> handlers = EventHandlers.delegate();
 
         // 不应抛异常
         handlers.invoke("SenderC", new MyEventArgs("NoHandler"));
