@@ -2,17 +2,17 @@ package org.ryuu.functional;
 
 import java.util.*;
 
-public abstract class MulticastDelegate<F extends Delegate> implements Iterable<F>, Delegate, Event<F> {
+public abstract class MulticastDelegate<T extends Delegate> implements Iterable<T>, Delegate, Event<T> {
     private final boolean isEvent;
     private final Object delegatesLock = new Object();
-    private List<F> delegates = Collections.emptyList();
+    private List<T> delegates = Collections.emptyList();
 
     public MulticastDelegate(boolean isEvent) {
         this.isEvent = isEvent;
     }
 
     @Override
-    public final Iterator<F> iterator() {
+    public final Iterator<T> iterator() {
         return delegates.iterator();
     }
 
@@ -36,7 +36,7 @@ public abstract class MulticastDelegate<F extends Delegate> implements Iterable<
     }
 
     @Override
-    public final void add(F delegate) {
+    public final void add(T delegate) {
         if (isEvent) {
             addSync(delegate);
         } else {
@@ -45,7 +45,7 @@ public abstract class MulticastDelegate<F extends Delegate> implements Iterable<
     }
 
     @Override
-    public final void remove(F delegate) {
+    public final void remove(T delegate) {
         if (isEvent) {
             removeSync(delegate);
         } else {
@@ -54,13 +54,13 @@ public abstract class MulticastDelegate<F extends Delegate> implements Iterable<
     }
 
     @SuppressWarnings("unchecked")
-    public final boolean contains(F delegate) {
+    public final boolean contains(T delegate) {
         if (delegate == null) {
             return false;
         } else if (delegate instanceof MulticastDelegate) {
-            return containsMulticast((MulticastDelegate<F>) delegate);
+            return containsMulticastDelegate((MulticastDelegate<T>) delegate);
         } else /* if (delegate instanceof Delegate) */ {
-            return containsUnicast(delegate);
+            return containsDelegate(delegate);
         }
     }
 
@@ -72,89 +72,89 @@ public abstract class MulticastDelegate<F extends Delegate> implements Iterable<
         return delegates.size();
     }
 
-    public final List<F> getDelegates() {
+    public final List<T> getDelegates() {
         return new ArrayList<>(delegates);
     }
 
-    private void addSync(F delegate) {
+    private void addSync(T delegate) {
         synchronized (delegatesLock) {
             addInternal(delegate);
         }
     }
 
-    private void removeSync(F delegate) {
+    private void removeSync(T delegate) {
         synchronized (delegatesLock) {
             removeInternal(delegate);
         }
     }
 
-    private void addAsync(F delegate) {
+    private void addAsync(T delegate) {
         addInternal(delegate);
     }
 
-    private void removeAsync(F delegate) {
+    private void removeAsync(T delegate) {
         removeInternal(delegate);
     }
 
     @SuppressWarnings("unchecked")
-    private void removeInternal(F delegate) {
+    private void removeInternal(T delegate) {
         if (delegate == null) {
             return;
         }
 
         if (delegate instanceof MulticastDelegate) {
-            removeMulticast((MulticastDelegate<F>) delegate);
+            removeMulticastDelegate((MulticastDelegate<T>) delegate);
         } else /* if (delegate instanceof Delegate) */ {
-            removeUnicast(delegate);
+            removeDelegate(delegate);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private void addInternal(F delegate) {
+    private void addInternal(T delegate) {
         if (delegate == null) {
             return;
         }
 
         if (delegate instanceof MulticastDelegate) {
-            addMulticast((MulticastDelegate<F>) delegate);
+            addMulticastDelegate((MulticastDelegate<T>) delegate);
         } else /* if (delegate instanceof Delegate) */ {
-            addUnicast(delegate);
+            addDelegate(delegate);
         }
     }
 
-    private void addUnicast(F unicast) {
-        List<F> newList = new ArrayList<>(delegates);
-        newList.add(unicast);
+    private void addDelegate(T delegate) {
+        List<T> newList = new ArrayList<>(delegates);
+        newList.add(delegate);
         delegates = Collections.unmodifiableList(newList);
     }
 
-    private void addMulticast(MulticastDelegate<F> multicastDelegate) {
+    private void addMulticastDelegate(MulticastDelegate<T> multicastDelegate) {
         if (multicastDelegate.delegates.isEmpty()) {
             return;
         }
 
-        List<F> newList = new ArrayList<>(delegates);
+        List<T> newList = new ArrayList<>(delegates);
         newList.addAll(multicastDelegate.delegates);
         delegates = Collections.unmodifiableList(newList);
     }
 
-    private void removeUnicast(F unicast) {
-        if (!delegates.contains(unicast)) {
+    private void removeDelegate(T delegate) {
+        if (!delegates.contains(delegate)) {
             return;
         }
 
-        List<F> newList = new ArrayList<>(delegates);
-        newList.remove(unicast);
+        List<T> newList = new ArrayList<>(delegates);
+        newList.remove(delegate);
         delegates = Collections.unmodifiableList(newList);
     }
 
-    private void removeMulticast(MulticastDelegate<F> multicastDelegate) {
+    private void removeMulticastDelegate(MulticastDelegate<T> multicastDelegate) {
         int sourceCount = count();
         int targetCount = multicastDelegate.count();
 
         for (int i = sourceCount - targetCount; i >= 0; i--) {
-            if (equal(multicastDelegate.delegates, i, targetCount)) {
-                List<F> newList = new ArrayList<>(delegates);
+            if (subListEquals(multicastDelegate.delegates, i, targetCount)) {
+                List<T> newList = new ArrayList<>(delegates);
                 newList.subList(i, i + targetCount).clear();
                 delegates = Collections.unmodifiableList(newList);
                 return;
@@ -162,16 +162,16 @@ public abstract class MulticastDelegate<F extends Delegate> implements Iterable<
         }
     }
 
-    private boolean containsUnicast(F unicast) {
-        return delegates.contains(unicast);
+    private boolean containsDelegate(T delegate) {
+        return delegates.contains(delegate);
     }
 
-    private boolean containsMulticast(MulticastDelegate<F> multicastDelegate) {
+    private boolean containsMulticastDelegate(MulticastDelegate<T> multicastDelegate) {
         int sourceCount = count();
         int targetCount = multicastDelegate.count();
 
         for (int i = sourceCount - targetCount; i >= 0; i--) {
-            if (equal(multicastDelegate.delegates, i, targetCount)) {
+            if (subListEquals(multicastDelegate.delegates, i, targetCount)) {
                 return true;
             }
         }
@@ -179,9 +179,9 @@ public abstract class MulticastDelegate<F extends Delegate> implements Iterable<
         return false;
     }
 
-    private boolean equal(List<F> unicastList, int start, int count) {
+    private boolean subListEquals(List<T> delegates, int start, int count) {
         for (int i = 0; i < count; i++) {
-            if (!this.delegates.get(i + start).equals(unicastList.get(i))) {
+            if (!this.delegates.get(i + start).equals(delegates.get(i))) {
                 return false;
             }
         }
