@@ -35,3 +35,17 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+tasks.register('runBenchMark', JavaExec) {
+    group = 'benchmark'
+    description = 'Run BenchMark JMH benchmarks'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'org.ryuu.functional.BenchMark'
+}
+
+tasks.register('runMultithreadBenchmark', JavaExec) {
+    group = 'benchmark'
+    description = 'Run MultithreadBenchmark JMH benchmarks'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'org.ryuu.functional.MultithreadBenchmark'
+}
