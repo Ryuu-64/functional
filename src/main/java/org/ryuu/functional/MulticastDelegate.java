@@ -4,7 +4,7 @@ import java.util.*;
 
 public abstract class MulticastDelegate<T extends Delegate> implements Iterable<T>, Delegate, Event<T> {
     private final boolean isEvent;
-    private final Object delegatesLock = new Object();
+    private final Object delegatesWriteLock = new Object();
     private List<T> delegates = Collections.emptyList();
 
     public MulticastDelegate(boolean isEvent) {
@@ -77,13 +77,13 @@ public abstract class MulticastDelegate<T extends Delegate> implements Iterable<
     }
 
     private void addSync(T delegate) {
-        synchronized (delegatesLock) {
+        synchronized (delegatesWriteLock) {
             addInternal(delegate);
         }
     }
 
     private void removeSync(T delegate) {
-        synchronized (delegatesLock) {
+        synchronized (delegatesWriteLock) {
             removeInternal(delegate);
         }
     }
