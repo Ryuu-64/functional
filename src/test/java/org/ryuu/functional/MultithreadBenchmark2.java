@@ -5,9 +5,7 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @BenchmarkMode({Mode.Throughput})
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
@@ -24,8 +22,6 @@ public class MultithreadBenchmark2 {
         public int baseActions;
 
         final Actions actions = Actions.event();
-        final ConcurrentLinkedQueue<Action> addedQueue = new ConcurrentLinkedQueue<>();
-        final AtomicInteger counter = new AtomicInteger();
 
         @Setup
         public void setup() {
