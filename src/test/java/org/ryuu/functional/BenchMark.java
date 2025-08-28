@@ -38,7 +38,7 @@ public class BenchMark {
                 .timeUnit(TimeUnit.NANOSECONDS)
                 .warmupIterations(5)
                 .measurementIterations(5)
-                .forks(1)
+                .forks(5)
                 .shouldFailOnError(true)
                 .shouldDoGC(true)
                 .build();

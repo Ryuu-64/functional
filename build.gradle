@@ -41,6 +41,13 @@ tasks.register('runBenchMark', JavaExec) {
     description = 'Run BenchMark JMH benchmarks'
     classpath = sourceSets.test.runtimeClasspath
     mainClass = 'org.ryuu.functional.BenchMark'
+
+    args = [
+            '-prof', 'gc',
+            '-prof', 'stack',
+            '-prof', 'jfr:dir=jfr:dir=build/reports/benchmark',
+            '-prof', 'async:output=build/reports/benchmark/flamegraph.svg'
+    ]
 }
 
 tasks.register('runMultithreadBenchmark', JavaExec) {
@@ -48,4 +55,11 @@ tasks.register('runMultithreadBenchmark', JavaExec) {
     description = 'Run MultithreadBenchmark JMH benchmarks'
     classpath = sourceSets.test.runtimeClasspath
     mainClass = 'org.ryuu.functional.MultithreadBenchmark'
+
+    args = [
+            '-prof', 'gc',
+            '-prof', 'stack',
+            '-prof', 'jfr:dir=jfr:dir=build/reports/benchmark',
+            '-prof', 'async:output=build/reports/benchmark/flamegraph.svg'
+    ]
 }

@@ -8,8 +8,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class EventTest {
-
-    private static class EventActions {
+    private static class ClassWithActionsEvent {
         private final Actions actions = Actions.event();
 
         public Event<Action> getActions() {
@@ -38,38 +37,38 @@ class EventTest {
 
     @Test
     void addAndInvoke_singleDelegate_shouldBeExecuted() {
-        EventActions eventActions = new EventActions();
+        ClassWithActionsEvent withEvent = new ClassWithActionsEvent();
         AtomicBoolean executed = new AtomicBoolean(false);
         Action action = () -> executed.set(true);
 
-        eventActions.getActions().add(action);
-        eventActions.invoke();
+        withEvent.getActions().add(action);
+        withEvent.invoke();
 
         assertTrue(executed.get(), "Delegate should be executed after invocation");
     }
 
     @Test
     void removeDelegate_shouldNotBeExecuted() {
-        EventActions eventActions = new EventActions();
+        ClassWithActionsEvent withEvent = new ClassWithActionsEvent();
         AtomicBoolean executed = new AtomicBoolean(false);
         Action action = () -> executed.set(true);
 
-        eventActions.getActions().add(action);
-        eventActions.getActions().remove(action);
-        eventActions.invoke();
+        withEvent.getActions().add(action);
+        withEvent.getActions().remove(action);
+        withEvent.invoke();
 
         assertFalse(executed.get(), "Delegate should not be executed after removal");
     }
 
     @Test
     void delegatesList_shouldBeEmptyAfterRemove() {
-        EventActions eventActions = new EventActions();
+        ClassWithActionsEvent withEvent = new ClassWithActionsEvent();
         Action action = () -> {
         };
-        eventActions.getActions().add(action);
-        eventActions.getActions().remove(action);
+        withEvent.getActions().add(action);
+        withEvent.getActions().remove(action);
 
-        List<Action> delegates = ((Actions) eventActions.getActions()).getDelegates();
+        List<Action> delegates = ((Actions) withEvent.getActions()).getDelegates();
         assertEquals(0, delegates.size(), "Delegates list should be empty after removing the only action");
     }
 
