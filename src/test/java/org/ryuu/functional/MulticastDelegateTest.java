@@ -439,7 +439,7 @@ class MulticastDelegateTest {
     private static Object getLockObject(Actions actions) {
         Field field;
         try {
-            field = MulticastDelegate.class.getDeclaredField("delegatesLock");
+            field = MulticastDelegate.class.getDeclaredField("delegatesWriteLock");
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
