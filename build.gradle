@@ -63,3 +63,18 @@ tasks.register('runMultithreadBenchmark', JavaExec) {
             '-prof', 'async:output=build/reports/benchmark/flamegraph.svg'
     ]
 }
+
+tasks.register('runMultithreadBenchmark2', JavaExec) {
+    group = 'benchmark'
+    description = 'Run MultithreadBenchmark2 JMH benchmarks'
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'org.ryuu.functional.MultithreadBenchmark2'
+
+    args = [
+            '-prof', 'gc',
+            '-prof', 'stack',
+            '-prof', 'jfr:dir=jfr:dir=build/reports/benchmark',
+            '-prof', 'async:output=build/reports/benchmark/flamegraph.svg'
+    ]
+}
+
