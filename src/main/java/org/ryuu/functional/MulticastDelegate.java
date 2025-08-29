@@ -12,7 +12,7 @@ public abstract class MulticastDelegate<T extends Delegate> implements Iterable<
 
         void removeDelegate(T delegate);
 
-        void removeSubList(int start, int count);
+        void removeMulticastDelegate(int start, int count);
 
         void clear();
     }
@@ -49,7 +49,7 @@ public abstract class MulticastDelegate<T extends Delegate> implements Iterable<
         }
 
         @Override
-        public void removeSubList(int start, int count) {
+        public void removeMulticastDelegate(int start, int count) {
             List<T> newDelegates = new ArrayList<>(delegates);
             newDelegates.subList(start, start + count).clear();
             this.delegates = Collections.unmodifiableList(newDelegates);
@@ -93,7 +93,7 @@ public abstract class MulticastDelegate<T extends Delegate> implements Iterable<
         }
 
         @Override
-        public synchronized void removeSubList(int start, int count) {
+        public synchronized void removeMulticastDelegate(int start, int count) {
             List<T> newDelegates = new ArrayList<>(delegates);
             newDelegates.subList(start, start + count).clear();
             this.delegates = Collections.unmodifiableList(newDelegates);
@@ -204,7 +204,7 @@ public abstract class MulticastDelegate<T extends Delegate> implements Iterable<
         List<T> targetDelegates = target.delegatesHolder.get();
         for (int i = sourceCount - targetCount; i >= 0; i--) {
             if (subListEquals(targetDelegates, i, targetCount)) {
-                delegatesHolder.removeSubList(i, targetCount);
+                delegatesHolder.removeMulticastDelegate(i, targetCount);
                 return;
             }
         }
