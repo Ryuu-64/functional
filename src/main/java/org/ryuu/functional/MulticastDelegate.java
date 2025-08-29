@@ -3,17 +3,117 @@ package org.ryuu.functional;
 import java.util.*;
 
 public abstract class MulticastDelegate<T extends Delegate> implements Iterable<T>, Delegate, Event<T> {
-    private final boolean isEvent;
-    private final Object delegatesWriteLock = new Object();
-    private List<T> delegates = Collections.emptyList();
+    private interface DelegatesHolder<T> {
+        List<T> get();
+
+        void addDelegate(T delegate);
+
+        void addAll(List<T> delegates);
+
+        void removeDelegate(T delegate);
+
+        void removeSubList(int start, int count);
+
+        void clear();
+    }
+
+    private static final class PlainDelegatesHolder<T> implements DelegatesHolder<T> {
+        private List<T> delegates = Collections.emptyList();
+
+        @Override
+        public List<T> get() {
+            return delegates;
+        }
+
+        @Override
+        public void addDelegate(T delegate) {
+            List<T> newDelegates = new ArrayList<>(delegates);
+            newDelegates.add(delegate);
+            this.delegates = Collections.unmodifiableList(newDelegates);
+        }
+
+        @Override
+        public void addAll(List<T> delegatesToAdd) {
+            if (delegatesToAdd.isEmpty()) return;
+            List<T> newDelegates = new ArrayList<>(delegates);
+            newDelegates.addAll(delegatesToAdd);
+            this.delegates = Collections.unmodifiableList(newDelegates);
+        }
+
+        @Override
+        public void removeDelegate(T delegate) {
+            if (!delegates.contains(delegate)) return;
+            List<T> newDelegates = new ArrayList<>(delegates);
+            newDelegates.remove(delegate);
+            this.delegates = Collections.unmodifiableList(newDelegates);
+        }
+
+        @Override
+        public void removeSubList(int start, int count) {
+            List<T> newDelegates = new ArrayList<>(delegates);
+            newDelegates.subList(start, start + count).clear();
+            this.delegates = Collections.unmodifiableList(newDelegates);
+        }
+
+        @Override
+        public void clear() {
+            this.delegates = Collections.emptyList();
+        }
+    }
+
+    private static final class EventDelegatesHolder<T> implements DelegatesHolder<T> {
+        private volatile List<T> delegates = Collections.emptyList();
+
+        @Override
+        public List<T> get() {
+            return delegates;
+        }
+
+        @Override
+        public synchronized void addDelegate(T delegate) {
+            List<T> newDelegates = new ArrayList<>(delegates);
+            newDelegates.add(delegate);
+            this.delegates = Collections.unmodifiableList(newDelegates);
+        }
+
+        @Override
+        public synchronized void addAll(List<T> delegatesToAdd) {
+            if (delegatesToAdd.isEmpty()) return;
+            List<T> newDelegates = new ArrayList<>(delegates);
+            newDelegates.addAll(delegatesToAdd);
+            this.delegates = Collections.unmodifiableList(newDelegates);
+        }
+
+        @Override
+        public synchronized void removeDelegate(T delegate) {
+            if (!delegates.contains(delegate)) return;
+            List<T> newDelegates = new ArrayList<>(delegates);
+            newDelegates.remove(delegate);
+            this.delegates = Collections.unmodifiableList(newDelegates);
+        }
+
+        @Override
+        public synchronized void removeSubList(int start, int count) {
+            List<T> newDelegates = new ArrayList<>(delegates);
+            newDelegates.subList(start, start + count).clear();
+            this.delegates = Collections.unmodifiableList(newDelegates);
+        }
+
+        @Override
+        public synchronized void clear() {
+            this.delegates = Collections.emptyList();
+        }
+    }
+
+    private final DelegatesHolder<T> delegatesHolder;
 
     public MulticastDelegate(boolean isEvent) {
-        this.isEvent = isEvent;
+        delegatesHolder = isEvent ? new EventDelegatesHolder<T>() : new PlainDelegatesHolder<T>();
     }
 
     @Override
     public final Iterator<T> iterator() {
-        return delegates.iterator();
+        return delegatesHolder.get().iterator();
     }
 
     @Override
@@ -27,29 +127,39 @@ public abstract class MulticastDelegate<T extends Delegate> implements Iterable<
         }
 
         MulticastDelegate<?> multicastDelegate = (MulticastDelegate<?>) obj;
-        return delegates.equals(multicastDelegate.delegates);
+        return delegatesHolder.get().equals(multicastDelegate.delegatesHolder.get());
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hash(delegates);
+        return Objects.hash(delegatesHolder.get());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public final void add(T delegate) {
-        if (isEvent) {
-            addSync(delegate);
-        } else {
-            addAsync(delegate);
+        if (delegate == null) {
+            return;
+        }
+
+        if (delegate instanceof MulticastDelegate) {
+            addMulticastDelegate((MulticastDelegate<T>) delegate);
+        } else /* if (delegate instanceof Delegate) */ {
+            addDelegate(delegate);
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public final void remove(T delegate) {
-        if (isEvent) {
-            removeSync(delegate);
-        } else {
-            removeAsync(delegate);
+        if (delegate == null) {
+            return;
+        }
+
+        if (delegate instanceof MulticastDelegate) {
+            removeMulticastDelegate((MulticastDelegate<T>) delegate);
+        } else /* if (delegate instanceof Delegate) */ {
+            removeDelegate(delegate);
         }
     }
 
@@ -65,113 +175,51 @@ public abstract class MulticastDelegate<T extends Delegate> implements Iterable<
     }
 
     public final void clear() {
-        delegates = Collections.emptyList();
+        delegatesHolder.clear();
     }
 
     public final int count() {
-        return delegates.size();
+        return delegatesHolder.get().size();
     }
 
     public final List<T> getDelegates() {
-        return new ArrayList<>(delegates);
-    }
-
-    private void addSync(T delegate) {
-        synchronized (delegatesWriteLock) {
-            addInternal(delegate);
-        }
-    }
-
-    private void removeSync(T delegate) {
-        synchronized (delegatesWriteLock) {
-            removeInternal(delegate);
-        }
-    }
-
-    private void addAsync(T delegate) {
-        addInternal(delegate);
-    }
-
-    private void removeAsync(T delegate) {
-        removeInternal(delegate);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void removeInternal(T delegate) {
-        if (delegate == null) {
-            return;
-        }
-
-        if (delegate instanceof MulticastDelegate) {
-            removeMulticastDelegate((MulticastDelegate<T>) delegate);
-        } else /* if (delegate instanceof Delegate) */ {
-            removeDelegate(delegate);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private void addInternal(T delegate) {
-        if (delegate == null) {
-            return;
-        }
-
-        if (delegate instanceof MulticastDelegate) {
-            addMulticastDelegate((MulticastDelegate<T>) delegate);
-        } else /* if (delegate instanceof Delegate) */ {
-            addDelegate(delegate);
-        }
+        return new ArrayList<>(delegatesHolder.get());
     }
 
     private void addDelegate(T delegate) {
-        List<T> newList = new ArrayList<>(delegates);
-        newList.add(delegate);
-        delegates = Collections.unmodifiableList(newList);
+        delegatesHolder.addDelegate(delegate);
     }
 
-    private void addMulticastDelegate(MulticastDelegate<T> multicastDelegate) {
-        if (multicastDelegate.delegates.isEmpty()) {
-            return;
-        }
-
-        List<T> newList = new ArrayList<>(delegates);
-        newList.addAll(multicastDelegate.delegates);
-        delegates = Collections.unmodifiableList(newList);
+    private void addMulticastDelegate(MulticastDelegate<T> other) {
+        delegatesHolder.addAll(other.delegatesHolder.get());
     }
 
     private void removeDelegate(T delegate) {
-        if (!delegates.contains(delegate)) {
-            return;
-        }
-
-        List<T> newList = new ArrayList<>(delegates);
-        newList.remove(delegate);
-        delegates = Collections.unmodifiableList(newList);
+        delegatesHolder.removeDelegate(delegate);
     }
 
-    private void removeMulticastDelegate(MulticastDelegate<T> multicastDelegate) {
+    private void removeMulticastDelegate(MulticastDelegate<T> target) {
         int sourceCount = count();
-        int targetCount = multicastDelegate.count();
-
+        int targetCount = target.count();
+        List<T> targetDelegates = target.delegatesHolder.get();
         for (int i = sourceCount - targetCount; i >= 0; i--) {
-            if (subListEquals(multicastDelegate.delegates, i, targetCount)) {
-                List<T> newList = new ArrayList<>(delegates);
-                newList.subList(i, i + targetCount).clear();
-                delegates = Collections.unmodifiableList(newList);
+            if (subListEquals(targetDelegates, i, targetCount)) {
+                delegatesHolder.removeSubList(i, targetCount);
                 return;
             }
         }
     }
 
     private boolean containsDelegate(T delegate) {
-        return delegates.contains(delegate);
+        return delegatesHolder.get().contains(delegate);
     }
 
-    private boolean containsMulticastDelegate(MulticastDelegate<T> multicastDelegate) {
+    private boolean containsMulticastDelegate(MulticastDelegate<T> target) {
         int sourceCount = count();
-        int targetCount = multicastDelegate.count();
-
+        int targetCount = target.count();
+        List<T> targetDelegates = target.delegatesHolder.get();
         for (int i = sourceCount - targetCount; i >= 0; i--) {
-            if (subListEquals(multicastDelegate.delegates, i, targetCount)) {
+            if (subListEquals(targetDelegates, i, targetCount)) {
                 return true;
             }
         }
@@ -179,9 +227,10 @@ public abstract class MulticastDelegate<T extends Delegate> implements Iterable<
         return false;
     }
 
-    private boolean subListEquals(List<T> delegates, int start, int count) {
+    private boolean subListEquals(List<T> target, int start, int count) {
+        List<T> delegates = delegatesHolder.get();
         for (int i = 0; i < count; i++) {
-            if (!this.delegates.get(i + start).equals(delegates.get(i))) {
+            if (!delegates.get(i + start).equals(target.get(i))) {
                 return false;
             }
         }
