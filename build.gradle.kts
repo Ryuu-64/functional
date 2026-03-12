@@ -19,10 +19,15 @@ repositories {
 dependencies {
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.13.4")
+    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-params (for parameterized tests)
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.13.4")
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.13.4")
     // https://mvnrepository.com/artifact/org.junit.platform/junit-platform-launcher
     testImplementation("org.junit.platform:junit-platform-launcher:1.13.4")
+
+    // https://mvnrepository.com/artifact/org.assertj/assertj-core
+    testImplementation("org.assertj:assertj-core:3.27.7")
 
     // https://mvnrepository.com/artifact/org.openjdk.jol/jol-core
     testImplementation("org.openjdk.jol:jol-core:0.17")
@@ -35,6 +40,12 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+    // Fix Chinese encoding issues in Java 8
+    jvmArgs("-Dfile.encoding=UTF-8")
+}
+
+tasks.compileTestJava {
+    options.encoding = "UTF-8"
 }
 
 jmh {

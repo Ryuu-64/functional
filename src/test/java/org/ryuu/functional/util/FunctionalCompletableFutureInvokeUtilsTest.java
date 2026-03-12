@@ -1,5 +1,7 @@
 package org.ryuu.functional.util;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.ryuu.functional.*;
 
@@ -7,164 +9,260 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.ryuu.functional.util.FunctionalCompletableFutureInvokeUtils.invokeAsync;
 
+@DisplayName("FunctionalCompletableFutureInvokeUtils")
 class FunctionalCompletableFutureInvokeUtilsTest {
-    @Test
-    void testActionAsyncAll() throws InterruptedException {
-        Executor executor = Executors.newFixedThreadPool(2);
 
-        // Action without args
-        AtomicBoolean flag = new AtomicBoolean(false);
-        Action action = () -> flag.set(true);
-        invokeAsync(action);
-        Thread.sleep(100);
-        assertTrue(flag.get());
+    @Nested
+    @DisplayName("异步 Action 调用")
+    class AsyncActionTests {
+        @Test
+        @DisplayName("应异步执行无参数 Action")
+        void shouldInvokeAsyncActionWithoutArgs() throws InterruptedException {
+            Executor executor = Executors.newFixedThreadPool(2);
 
-        flag.set(false);
-        invokeAsync(action, executor);
-        Thread.sleep(100);
-        assertTrue(flag.get());
+            AtomicBoolean flag = new AtomicBoolean(false);
+            Action action = () -> flag.set(true);
+            invokeAsync(action);
+            Thread.sleep(100);
+            assertThat(flag.get()).isTrue();
 
-        // Action1Arg
-        AtomicInteger result1 = new AtomicInteger();
-        Action1Arg<Integer> act1 = result1::set;
-        invokeAsync(act1, 10);
-        Thread.sleep(100);
-        assertEquals(10, result1.get());
+            flag.set(false);
+            invokeAsync(action, executor);
+            Thread.sleep(100);
+            assertThat(flag.get()).isTrue();
+        }
 
-        invokeAsync(act1, 20, executor);
-        Thread.sleep(100);
-        assertEquals(20, result1.get());
+        @Test
+        @DisplayName("应异步执行单参数 Action")
+        void shouldInvokeAsyncAction1Arg() throws InterruptedException {
+            Executor executor = Executors.newFixedThreadPool(2);
 
-        // Action2Args
-        Action2Args<Integer, Integer> act2 = (a, b) -> result1.set(a + b);
-        invokeAsync(act2, 3, 4);
-        Thread.sleep(100);
-        assertEquals(7, result1.get());
+            AtomicInteger result = new AtomicInteger();
+            Action1Arg<Integer> action1 = result::set;
+            invokeAsync(action1, 10);
+            Thread.sleep(100);
+            assertThat(result.get()).isEqualTo(10);
 
-        invokeAsync(act2, 5, 6, executor);
-        Thread.sleep(100);
-        assertEquals(11, result1.get());
+            invokeAsync(action1, 20, executor);
+            Thread.sleep(100);
+            assertThat(result.get()).isEqualTo(20);
+        }
 
-        // Action3Args
-        Action3Args<Integer, Integer, Integer> act3 = (a, b, c) -> result1.set(a + b + c);
-        invokeAsync(act3, 1, 2, 3);
-        Thread.sleep(100);
-        assertEquals(6, result1.get());
+        @Test
+        @DisplayName("应异步执行双参数 Action")
+        void shouldInvokeAsyncAction2Args() throws InterruptedException {
+            Executor executor = Executors.newFixedThreadPool(2);
 
-        invokeAsync(act3, 2, 3, 4, executor);
-        Thread.sleep(100);
-        assertEquals(9, result1.get());
+            AtomicInteger result = new AtomicInteger();
+            Action2Args<Integer, Integer> action2 = (a, b) -> result.set(a + b);
+            invokeAsync(action2, 3, 4);
+            Thread.sleep(100);
+            assertThat(result.get()).isEqualTo(7);
 
-        // Action4Args
-        Action4Args<Integer, Integer, Integer, Integer> act4 = (a, b, c, d) -> result1.set(a + b + c + d);
-        invokeAsync(act4, 1, 2, 3, 4);
-        Thread.sleep(100);
-        assertEquals(10, result1.get());
+            invokeAsync(action2, 5, 6, executor);
+            Thread.sleep(100);
+            assertThat(result.get()).isEqualTo(11);
+        }
 
-        invokeAsync(act4, 2, 3, 4, 5, executor);
-        Thread.sleep(100);
-        assertEquals(14, result1.get());
+        @Test
+        @DisplayName("应异步执行三参数 Action")
+        void shouldInvokeAsyncAction3Args() throws InterruptedException {
+            Executor executor = Executors.newFixedThreadPool(2);
 
-        // Action5Args
-        Action5Args<Integer, Integer, Integer, Integer, Integer> act5 = (a, b, c, d, e) -> result1.set(a + b + c + d + e);
-        invokeAsync(act5, 1, 2, 3, 4, 5);
-        Thread.sleep(100);
-        assertEquals(15, result1.get());
+            AtomicInteger result = new AtomicInteger();
+            Action3Args<Integer, Integer, Integer> action3 = (a, b, c) -> result.set(a + b + c);
+            invokeAsync(action3, 1, 2, 3);
+            Thread.sleep(100);
+            assertThat(result.get()).isEqualTo(6);
 
-        invokeAsync(act5, 2, 3, 4, 5, 6, executor);
-        Thread.sleep(100);
-        assertEquals(20, result1.get());
+            invokeAsync(action3, 2, 3, 4, executor);
+            Thread.sleep(100);
+            assertThat(result.get()).isEqualTo(9);
+        }
 
-        // Action6Args
-        Action6Args<Integer, Integer, Integer, Integer, Integer, Integer> act6 = (a, b, c, d, e, f) -> result1.set(a + b + c + d + e + f);
-        invokeAsync(act6, 1, 2, 3, 4, 5, 6);
-        Thread.sleep(100);
-        assertEquals(21, result1.get());
+        @Test
+        @DisplayName("应异步执行四参数 Action")
+        void shouldInvokeAsyncAction4Args() throws InterruptedException {
+            Executor executor = Executors.newFixedThreadPool(2);
 
-        invokeAsync(act6, 2, 3, 4, 5, 6, 7, executor);
-        Thread.sleep(100);
-        assertEquals(27, result1.get());
+            AtomicInteger result = new AtomicInteger();
+            Action4Args<Integer, Integer, Integer, Integer> action4 = (a, b, c, d) -> result.set(a + b + c + d);
+            invokeAsync(action4, 1, 2, 3, 4);
+            Thread.sleep(100);
+            assertThat(result.get()).isEqualTo(10);
 
-        // Action7Args
-        Action7Args<Integer, Integer, Integer, Integer, Integer, Integer, Integer> act7 =
-                (a, b, c, d, e, f, g) -> result1.set(a + b + c + d + e + f + g);
-        invokeAsync(act7, 1, 2, 3, 4, 5, 6, 7);
-        Thread.sleep(100);
-        assertEquals(28, result1.get());
+            invokeAsync(action4, 2, 3, 4, 5, executor);
+            Thread.sleep(100);
+            assertThat(result.get()).isEqualTo(14);
+        }
 
-        invokeAsync(act7, 2, 3, 4, 5, 6, 7, 8, executor);
-        Thread.sleep(100);
-        assertEquals(35, result1.get());
+        @Test
+        @DisplayName("应异步执行五参数 Action")
+        void shouldInvokeAsyncAction5Args() throws InterruptedException {
+            Executor executor = Executors.newFixedThreadPool(2);
 
-        // Action8Args
-        Action8Args<Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer> act8 =
-                (a, b, c, d, e, f, g, h) -> result1.set(a + b + c + d + e + f + g + h);
-        invokeAsync(act8, 1, 2, 3, 4, 5, 6, 7, 8);
-        Thread.sleep(100);
-        assertEquals(36, result1.get());
+            AtomicInteger result = new AtomicInteger();
+            Action5Args<Integer, Integer, Integer, Integer, Integer> action5 = (a, b, c, d, e) -> result.set(a + b + c + d + e);
+            invokeAsync(action5, 1, 2, 3, 4, 5);
+            Thread.sleep(100);
+            assertThat(result.get()).isEqualTo(15);
 
-        invokeAsync(act8, 2, 3, 4, 5, 6, 7, 8, 9, executor);
-        Thread.sleep(100);
-        assertEquals(44, result1.get());
+            invokeAsync(action5, 2, 3, 4, 5, 6, executor);
+            Thread.sleep(100);
+            assertThat(result.get()).isEqualTo(20);
+        }
+
+        @Test
+        @DisplayName("应异步执行六参数 Action")
+        void shouldInvokeAsyncAction6Args() throws InterruptedException {
+            Executor executor = Executors.newFixedThreadPool(2);
+
+            AtomicInteger result = new AtomicInteger();
+            Action6Args<Integer, Integer, Integer, Integer, Integer, Integer> action6 = (a, b, c, d, e, f) -> result.set(a + b + c + d + e + f);
+            invokeAsync(action6, 1, 2, 3, 4, 5, 6);
+            Thread.sleep(100);
+            assertThat(result.get()).isEqualTo(21);
+
+            invokeAsync(action6, 2, 3, 4, 5, 6, 7, executor);
+            Thread.sleep(100);
+            assertThat(result.get()).isEqualTo(27);
+        }
+
+        @Test
+        @DisplayName("应异步执行七参数 Action")
+        void shouldInvokeAsyncAction7Args() throws InterruptedException {
+            Executor executor = Executors.newFixedThreadPool(2);
+
+            AtomicInteger result = new AtomicInteger();
+            Action7Args<Integer, Integer, Integer, Integer, Integer, Integer, Integer> action7 =
+                    (a, b, c, d, e, f, g) -> result.set(a + b + c + d + e + f + g);
+            invokeAsync(action7, 1, 2, 3, 4, 5, 6, 7);
+            Thread.sleep(100);
+            assertThat(result.get()).isEqualTo(28);
+
+            invokeAsync(action7, 2, 3, 4, 5, 6, 7, 8, executor);
+            Thread.sleep(100);
+            assertThat(result.get()).isEqualTo(35);
+        }
+
+        @Test
+        @DisplayName("应异步执行八参数 Action")
+        void shouldInvokeAsyncAction8Args() throws InterruptedException {
+            Executor executor = Executors.newFixedThreadPool(2);
+
+            AtomicInteger result = new AtomicInteger();
+            Action8Args<Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer> action8 =
+                    (a, b, c, d, e, f, g, h) -> result.set(a + b + c + d + e + f + g + h);
+            invokeAsync(action8, 1, 2, 3, 4, 5, 6, 7, 8);
+            Thread.sleep(100);
+            assertThat(result.get()).isEqualTo(36);
+
+            invokeAsync(action8, 2, 3, 4, 5, 6, 7, 8, 9, executor);
+            Thread.sleep(100);
+            assertThat(result.get()).isEqualTo(44);
+        }
     }
 
-    @Test
-    void testFuncAsyncAll() throws ExecutionException, InterruptedException, TimeoutException {
-        Executor executor = Executors.newFixedThreadPool(2);
+    @Nested
+    @DisplayName("异步 Func 调用")
+    class AsyncFuncTests {
+        @Test
+        @DisplayName("应异步执行无参数 Func")
+        void shouldInvokeAsyncFuncWithoutArgs() throws ExecutionException, InterruptedException, TimeoutException {
+            Executor executor = Executors.newFixedThreadPool(2);
 
-        // Func
-        Func<Integer> func = () -> 42;
-        CompletableFuture<Integer> future = invokeAsync(func);
-        assertEquals(42, future.get(1, TimeUnit.SECONDS));
+            Func<Integer> func = () -> 42;
+            CompletableFuture<Integer> future = invokeAsync(func);
+            assertThat(future.get(1, TimeUnit.SECONDS)).isEqualTo(42);
 
-        CompletableFuture<Integer> futureExec = invokeAsync(func, executor);
-        assertEquals(42, futureExec.get(1, TimeUnit.SECONDS));
+            CompletableFuture<Integer> futureExec = invokeAsync(func, executor);
+            assertThat(futureExec.get(1, TimeUnit.SECONDS)).isEqualTo(42);
+        }
 
-        // Func1Arg
-        Func1Arg<Integer, Integer> func1 = x -> x * 2;
-        assertEquals(84, invokeAsync(func1, 42).get(1, TimeUnit.SECONDS));
-        assertEquals(100, invokeAsync(func1, 50, executor).get(1, TimeUnit.SECONDS));
+        @Test
+        @DisplayName("应异步执行单参数 Func")
+        void shouldInvokeAsyncFunc1Arg() throws ExecutionException, InterruptedException, TimeoutException {
+            Executor executor = Executors.newFixedThreadPool(2);
 
-        // Func2Args
-        Func2Args<Integer, Integer, Integer> func2 = Integer::sum;
-        assertEquals(42, invokeAsync(func2, 10, 32).get(1, TimeUnit.SECONDS));
-        assertEquals(50, invokeAsync(func2, 20, 30, executor).get(1, TimeUnit.SECONDS));
+            Func1Arg<Integer, Integer> func1 = x -> x * 2;
+            assertThat(invokeAsync(func1, 42).get(1, TimeUnit.SECONDS)).isEqualTo(84);
+            assertThat(invokeAsync(func1, 50, executor).get(1, TimeUnit.SECONDS)).isEqualTo(100);
+        }
 
-        // Func3Args
-        Func3Args<Integer, Integer, Integer, Integer> func3 = (a, b, c) -> a + b + c;
-        assertEquals(6, invokeAsync(func3, 1, 2, 3).get(1, TimeUnit.SECONDS));
-        assertEquals(15, invokeAsync(func3, 4, 5, 6, executor).get(1, TimeUnit.SECONDS));
+        @Test
+        @DisplayName("应异步执行双参数 Func")
+        void shouldInvokeAsyncFunc2Args() throws ExecutionException, InterruptedException, TimeoutException {
+            Executor executor = Executors.newFixedThreadPool(2);
 
-        // Func4Args
-        Func4Args<Integer, Integer, Integer, Integer, Integer> func4 = (a, b, c, d) -> a + b + c + d;
-        assertEquals(10, invokeAsync(func4, 1, 2, 3, 4).get(1, TimeUnit.SECONDS));
-        assertEquals(26, invokeAsync(func4, 5, 6, 7, 8, executor).get(1, TimeUnit.SECONDS));
+            Func2Args<Integer, Integer, Integer> func2 = Integer::sum;
+            assertThat(invokeAsync(func2, 10, 32).get(1, TimeUnit.SECONDS)).isEqualTo(42);
+            assertThat(invokeAsync(func2, 20, 30, executor).get(1, TimeUnit.SECONDS)).isEqualTo(50);
+        }
 
-        // Func5Args
-        Func5Args<Integer, Integer, Integer, Integer, Integer, Integer> func5 = (a, b, c, d, e) -> a + b + c + d + e;
-        assertEquals(15, invokeAsync(func5, 1, 2, 3, 4, 5).get(1, TimeUnit.SECONDS));
-        assertEquals(40, invokeAsync(func5, 6, 7, 8, 9, 10, executor).get(1, TimeUnit.SECONDS));
+        @Test
+        @DisplayName("应异步执行三参数 Func")
+        void shouldInvokeAsyncFunc3Args() throws ExecutionException, InterruptedException, TimeoutException {
+            Executor executor = Executors.newFixedThreadPool(2);
 
-        // Func6Args
-        Func6Args<Integer, Integer, Integer, Integer, Integer, Integer, Integer> func6 =
-                (a, b, c, d, e, f) -> a + b + c + d + e + f;
-        assertEquals(21, invokeAsync(func6, 1, 2, 3, 4, 5, 6).get(1, TimeUnit.SECONDS));
-        assertEquals(36, invokeAsync(func6, 6, 6, 6, 6, 6, 6, executor).get(1, TimeUnit.SECONDS));
+            Func3Args<Integer, Integer, Integer, Integer> func3 = (a, b, c) -> a + b + c;
+            assertThat(invokeAsync(func3, 1, 2, 3).get(1, TimeUnit.SECONDS)).isEqualTo(6);
+            assertThat(invokeAsync(func3, 4, 5, 6, executor).get(1, TimeUnit.SECONDS)).isEqualTo(15);
+        }
 
-        // Func7Args
-        Func7Args<Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer> func7 =
-                (a, b, c, d, e, f, g) -> a + b + c + d + e + f + g;
-        assertEquals(28, invokeAsync(func7, 1, 2, 3, 4, 5, 6, 7).get(1, TimeUnit.SECONDS));
-        assertEquals(56, invokeAsync(func7, 8, 8, 8, 8, 8, 8, 8, executor).get(1, TimeUnit.SECONDS));
+        @Test
+        @DisplayName("应异步执行四参数 Func")
+        void shouldInvokeAsyncFunc4Args() throws ExecutionException, InterruptedException, TimeoutException {
+            Executor executor = Executors.newFixedThreadPool(2);
 
-        // Func8Args
-        Func8Args<Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer> func8 =
-                (a, b, c, d, e, f, g, h) -> a + b + c + d + e + f + g + h;
-        assertEquals(36, invokeAsync(func8, 1, 2, 3, 4, 5, 6, 7, 8).get(1, TimeUnit.SECONDS));
-        assertEquals(72, invokeAsync(func8, 9, 9, 9, 9, 9, 9, 9, 9, executor).get(1, TimeUnit.SECONDS));
+            Func4Args<Integer, Integer, Integer, Integer, Integer> func4 = (a, b, c, d) -> a + b + c + d;
+            assertThat(invokeAsync(func4, 1, 2, 3, 4).get(1, TimeUnit.SECONDS)).isEqualTo(10);
+            assertThat(invokeAsync(func4, 5, 6, 7, 8, executor).get(1, TimeUnit.SECONDS)).isEqualTo(26);
+        }
+
+        @Test
+        @DisplayName("应异步执行五参数 Func")
+        void shouldInvokeAsyncFunc5Args() throws ExecutionException, InterruptedException, TimeoutException {
+            Executor executor = Executors.newFixedThreadPool(2);
+
+            Func5Args<Integer, Integer, Integer, Integer, Integer, Integer> func5 = (a, b, c, d, e) -> a + b + c + d + e;
+            assertThat(invokeAsync(func5, 1, 2, 3, 4, 5).get(1, TimeUnit.SECONDS)).isEqualTo(15);
+            assertThat(invokeAsync(func5, 6, 7, 8, 9, 10, executor).get(1, TimeUnit.SECONDS)).isEqualTo(40);
+        }
+
+        @Test
+        @DisplayName("应异步执行六参数 Func")
+        void shouldInvokeAsyncFunc6Args() throws ExecutionException, InterruptedException, TimeoutException {
+            Executor executor = Executors.newFixedThreadPool(2);
+
+            Func6Args<Integer, Integer, Integer, Integer, Integer, Integer, Integer> func6 =
+                    (a, b, c, d, e, f) -> a + b + c + d + e + f;
+            assertThat(invokeAsync(func6, 1, 2, 3, 4, 5, 6).get(1, TimeUnit.SECONDS)).isEqualTo(21);
+            assertThat(invokeAsync(func6, 6, 6, 6, 6, 6, 6, executor).get(1, TimeUnit.SECONDS)).isEqualTo(36);
+        }
+
+        @Test
+        @DisplayName("应异步执行七参数 Func")
+        void shouldInvokeAsyncFunc7Args() throws ExecutionException, InterruptedException, TimeoutException {
+            Executor executor = Executors.newFixedThreadPool(2);
+
+            Func7Args<Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer> func7 =
+                    (a, b, c, d, e, f, g) -> a + b + c + d + e + f + g;
+            assertThat(invokeAsync(func7, 1, 2, 3, 4, 5, 6, 7).get(1, TimeUnit.SECONDS)).isEqualTo(28);
+            assertThat(invokeAsync(func7, 8, 8, 8, 8, 8, 8, 8, executor).get(1, TimeUnit.SECONDS)).isEqualTo(56);
+        }
+
+        @Test
+        @DisplayName("应异步执行八参数 Func")
+        void shouldInvokeAsyncFunc8Args() throws ExecutionException, InterruptedException, TimeoutException {
+            Executor executor = Executors.newFixedThreadPool(2);
+
+            Func8Args<Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer, Integer> func8 =
+                    (a, b, c, d, e, f, g, h) -> a + b + c + d + e + f + g + h;
+            assertThat(invokeAsync(func8, 1, 2, 3, 4, 5, 6, 7, 8).get(1, TimeUnit.SECONDS)).isEqualTo(36);
+            assertThat(invokeAsync(func8, 9, 9, 9, 9, 9, 9, 9, 9, executor).get(1, TimeUnit.SECONDS)).isEqualTo(72);
+        }
     }
 }
