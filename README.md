@@ -8,6 +8,8 @@
 
 > Multicast Delegate for Java - Bringing C# Delegate experience to Java
 
+Maintainer documentation: [docs/README.md](./docs/README.md)
+
 ## Features
 
 - 🚀 **Multicast Delegate** - Invoke multiple methods with one delegate
