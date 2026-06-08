@@ -76,9 +76,9 @@ actions.invoke("Alice", 25);
 Func2Args<Integer, Integer, Integer> add = Func2Args.delegate();
 
 add.add((a, b) -> a + b);
-add.add((a, b) -> a * b); // 多播只执行第一个，返回第一个结果
+add.add((a, b) -> a * b); // 多播会按顺序执行所有委托，并返回最后一个结果
 
-Integer result = add.invoke(3, 4); // 返回 7
+Integer result = add.invoke(3, 4); // 返回 12
 ```
 
 ### 事件处理器
@@ -180,7 +180,7 @@ MultithreadBenchmark.mix:remove   64    1.267  ops/us
 
 ### Q: 多播委托的返回值如何处理?
 
-多播委托只返回第一个执行的委托的返回值，其他返回值被忽略。
+多播委托会按顺序执行所有委托，并返回最后一个执行的委托的返回值。前面的返回值会被忽略。
 
 ### Q: 可以在 `invoke` 过程中修改委托集合吗?
 

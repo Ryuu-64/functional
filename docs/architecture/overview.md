@@ -32,9 +32,9 @@ reflection, arrays, or varargs for the primary callback path.
 
 ## Return Values
 
-Multicast `Func` variants return the first callback result. Later callback
-results are ignored. This behavior is part of the public contract and is
-covered by tests.
+Multicast `Func` variants invoke every callback in order and return the last
+callback result. Earlier callback results are ignored. This behavior is part of
+the public contract and is covered by tests.
 
 ## Thread Safety Boundary
 

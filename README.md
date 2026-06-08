@@ -78,9 +78,9 @@ actions.invoke("Alice", 25);
 Func2Args<Integer, Integer, Integer> add = Func2Args.delegate();
 
 add.add((a, b) -> a + b);
-add.add((a, b) -> a * b); // Multicast returns only the first result
+add.add((a, b) -> a * b); // Multicast returns the last result
 
-Integer result = add.invoke(3, 4); // Returns 7
+Integer result = add.invoke(3, 4); // Returns 12
 ```
 
 ### Event Handler
@@ -183,7 +183,7 @@ Following C# terminology. Executing a functional interface is "invoking" the tar
 
 ### Q: How are return values handled in multicast?
 
-Multicast delegate only returns the value from the first executed delegate. Other return values are ignored.
+Multicast delegate invokes all delegates in order and returns the value from the last executed delegate. Earlier return values are ignored.
 
 ### Q: Can I modify the delegate collection during invoke?
 
