@@ -11,7 +11,7 @@
 ## 特性
 
 - 🚀 **多播委托** - 支持一个委托调用多个方法
-- 🔒 **线程安全** - Event 模式内置同步机制
+- 🔒 **订阅安全** - Event 模式内置 add/remove 同步机制
 - 📚 **统一接口** - 0-8 参数的函数式接口全覆盖
 - 🧩 **事件驱动** - 完善的观察者模式支持
 
@@ -46,10 +46,10 @@ actions.invoke();
 // 方法2
 ```
 
-### 事件模式 (线程安全)
+### 事件模式
 
 ```java
-// Event 模式：线程安全，适用于发布订阅
+// Event 模式：add/remove 同步，适用于发布订阅
 Actions event = Actions.event();
 
 // Delegate 模式：高性能，但非线程安全
@@ -110,8 +110,8 @@ handlers.invoke("Sender", new MyEventArgs("Hello"));
 
 ### 多播接口
 
-| 类型 | 创建方式 | 线程安全 | 适用场景 |
-|------|----------|----------|----------|
+| 类型 | 创建方式 | add/remove 同步 | 适用场景 |
+|------|----------|-----------------|----------|
 | `Actions.delegate()` | 静态工厂 | ❌ 否 | 单线程，高性能 |
 | `Actions.event()` | 静态工厂 | ✅ 是 | 多线程，发布订阅 |
 
@@ -131,9 +131,10 @@ handlers.invoke("Sender", new MyEventArgs("Hello"));
 
 | 特性 | delegate() | event() |
 |------|------------|---------|
-| 线程安全 | ❌ 否 | ✅ 是 |
-| 性能 | 高 | 有同步开销 |
-| 适用场景 | 单线程，高性能需求 | 多线程，发布订阅 |
+| add/remove 同步 | ❌ 否 | ✅ 是 |
+| 存储策略 | Copy-on-write 快照列表 | Copy-on-write 快照列表 |
+| 性能 | 高 | 订阅变更有同步开销 |
+| 适用场景 | 单线程，高性能需求 | 多线程订阅变更 |
 
 ### 安全使用准则
 
@@ -143,10 +144,10 @@ Actions delegates = Actions.delegate();
 delegates.add(() -> System.out.println("1"));
 delegates.invoke();
 
-// ✅ 正确：多线程使用 Event
+// ✅ 正确：多个线程可能 add/remove 时使用 Event
 Actions events = Actions.event();
 events.add(() -> System.out.println("1"));
-// 多个线程可以安全调用
+// 多个线程可以安全变更订阅
 events.invoke();
 
 // ❌ 错误：多线程使用 Delegate 会丢失操作
@@ -161,10 +162,10 @@ Actions delegates = Actions.delegate();
 ```
 Benchmark                    Mode  Cnt   Score   Units
 ─────────────────────────────────────────────────────────
-MultithreadBenchmark.mix    thrpt   64   11.635  ops/us
-MultithreadBenchmark.mix:add      64    0.649  ops/us
-MultithreadBenchmark.mix:invoke   64    9.719  ops/us
-MultithreadBenchmark.mix:remove   64    1.267  ops/us
+MultithreadMixedOpsBenchmark.mix         thrpt   64   11.635  ops/us
+MultithreadMixedOpsBenchmark.mix:add     thrpt   64    0.649  ops/us
+MultithreadMixedOpsBenchmark.mix:invoke  thrpt   64    9.719  ops/us
+MultithreadMixedOpsBenchmark.mix:remove  thrpt   64    1.267  ops/us
 ```
 
 ## 常见问题
@@ -175,8 +176,8 @@ MultithreadBenchmark.mix:remove   64    1.267  ops/us
 
 ### Q: Delegate 和 Event 有什么区别?
 
-- `Delegate` 采用 Copy-on-Write 策略，性能更高，但**不是线程安全的**
-- `Event` 使用 `synchronized` 同步，**线程安全**，适合多线程环境
+- `Delegate` 使用未同步的 copy-on-write 快照列表，性能更高，但不适合并发订阅变更。
+- `Event` 使用同样的 copy-on-write 快照列表，并在 `add` 和 `remove` 外加 `synchronized`，适合多线程发布订阅场景下的订阅变更。
 
 ### Q: 多播委托的返回值如何处理?
 
@@ -184,7 +185,7 @@ MultithreadBenchmark.mix:remove   64    1.267  ops/us
 
 ### Q: 可以在 `invoke` 过程中修改委托集合吗?
 
-支持，但行为可能未定义。建议在调用前完成所有添加/移除操作。
+可以。`invoke()` 使用 snapshot semantics：调用过程中发生的订阅变更不会影响当前这次调用，只会在后续调用中生效。
 
 ## 致谢
 

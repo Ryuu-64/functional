@@ -15,7 +15,8 @@ events to Java. The public API is organized around:
 - `Action` and `Actions` variants for no-return callbacks.
 - `Func` and `Funcs` variants for callbacks with return values.
 - `EventHandler`, `EventHandlers`, and `EventArgs` for event-style APIs.
-- `Delegate` and `Event` as the core multicast implementations.
+- `Delegate` as the callback marker interface, `Event` as the subscription
+  interface, and `MulticastDelegate` as the shared multicast implementation.
 - Utility helpers under `org.ryuu.functional.util`.
 
 The project is built with Gradle and targets Java 8 through the Gradle Java
