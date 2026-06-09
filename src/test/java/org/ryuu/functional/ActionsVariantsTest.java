@@ -48,8 +48,8 @@ class ActionsVariantsTest {
         }
 
         @Test
-        @DisplayName("event mode should be thread-safe")
-        void eventShouldBeThreadSafe() {
+        @DisplayName("event mode should support concurrent snapshot invocation")
+        void eventShouldSupportConcurrentSnapshotInvocation() {
             final Actions1Arg<Integer> actions = Actions1Arg.event();
             final AtomicInteger counter = new AtomicInteger(0);
 
@@ -62,7 +62,7 @@ class ActionsVariantsTest {
                 });
             }
 
-            // Multiple threads invoke simultaneously
+            // Multiple threads invoke the same snapshot simultaneously.
             Thread[] threads = new Thread[10];
             for (int i = 0; i < threads.length; i++) {
                 threads[i] = new Thread(new Runnable() {

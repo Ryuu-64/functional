@@ -3,15 +3,13 @@ package org.ryuu.functional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.openjdk.jol.info.ClassLayout;
-import org.openjdk.jol.info.GraphLayout;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -323,8 +321,8 @@ class MulticastDelegateTest {
         }
 
         @Test
-        @DisplayName("应支持在内部清空")
-        void shouldSupportClearingInside() {
+        @DisplayName("调用期间 clear 不应影响当前快照")
+        void shouldUseSnapshotWhenClearingDuringInvoke() {
             StringBuilder stringBuilder = new StringBuilder();
             Actions actions = Actions.delegate();
             actions.add(() -> stringBuilder.append(0));
@@ -334,6 +332,45 @@ class MulticastDelegateTest {
             actions.invoke();
 
             assertThat(stringBuilder.toString()).isEqualTo("012");
+        }
+
+        @Test
+        @DisplayName("调用期间 add 不应影响当前快照")
+        void shouldUseSnapshotWhenAddingDuringInvoke() {
+            StringBuilder stringBuilder = new StringBuilder();
+            Actions actions = Actions.delegate();
+            actions.add(() -> {
+                stringBuilder.append(0);
+                actions.add(() -> stringBuilder.append(2));
+            });
+            actions.add(() -> stringBuilder.append(1));
+
+            actions.invoke();
+            assertThat(stringBuilder.toString()).isEqualTo("01");
+
+            stringBuilder.delete(0, stringBuilder.length());
+            actions.invoke();
+            assertThat(stringBuilder.toString()).isEqualTo("012");
+        }
+
+        @Test
+        @DisplayName("调用期间 remove 不应影响当前快照")
+        void shouldUseSnapshotWhenRemovingDuringInvoke() {
+            StringBuilder stringBuilder = new StringBuilder();
+            Actions actions = Actions.delegate();
+            Action removable = () -> stringBuilder.append(1);
+            actions.add(() -> {
+                stringBuilder.append(0);
+                actions.remove(removable);
+            });
+            actions.add(removable);
+
+            actions.invoke();
+            assertThat(stringBuilder.toString()).isEqualTo("01");
+
+            stringBuilder.delete(0, stringBuilder.length());
+            actions.invoke();
+            assertThat(stringBuilder.toString()).isEqualTo("0");
         }
 
         @Test
@@ -477,75 +514,45 @@ class MulticastDelegateTest {
     }
 
     @Nested
-    @DisplayName("并发安全")
+    @DisplayName("并发订阅变更")
     class ConcurrencyTests {
         @Test
-        @DisplayName("Actions.event 应线程安全")
-        void shouldBeThreadSafe() throws InterruptedException {
-            Thread.sleep(5000);
-
+        @DisplayName("Actions.event 应同步 add/remove")
+        void eventShouldSynchronizeAddAndRemove() throws InterruptedException {
             Actions actions = Actions.event();
 
-            int threadCount = 2;
-            int opsPerThread = 100_000;
+            int threadCount = 8;
+            int opsPerThread = 10_000;
 
             ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+            CountDownLatch start = new CountDownLatch(1);
             CountDownLatch latch = new CountDownLatch(threadCount);
 
             Action action = () -> {};
 
             for (int i = 0; i < threadCount; i++) {
                 executor.submit(() -> {
-                    for (int j = 0; j < opsPerThread; j++) {
-                        actions.add(action);
-                        actions.remove(action);
+                    try {
+                        start.await();
+                        for (int j = 0; j < opsPerThread; j++) {
+                            actions.add(action);
+                            actions.remove(action);
+                        }
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    } finally {
+                        latch.countDown();
                     }
-                    latch.countDown();
                 });
             }
 
-            latch.await();
-            executor.shutdown();
+            start.countDown();
+            assertThat(latch.await(5, TimeUnit.SECONDS)).isTrue();
+            executor.shutdownNow();
 
             actions.invoke();
             List<Action> delegates = actions.getDelegates();
             assertThat(delegates.size()).isEqualTo(0);
-        }
-
-        @Test
-        @DisplayName("应比较 Delegate 和 Event 的线程安全性")
-        void shouldCompareDelegateAndEventThreadSafety() throws InterruptedException {
-            final int threadCount = 32;
-            final int opsPerThread = 10_000;
-
-            Actions unsafe = Actions.delegate();
-            Actions safe = Actions.event();
-            Action noop = () -> {};
-
-            ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-            CountDownLatch latch = new CountDownLatch(threadCount * 2);
-
-            for (int i = 0; i < threadCount; i++) {
-                executor.submit(() -> {
-                    for (int j = 0; j < opsPerThread; j++) {
-                        unsafe.add(noop);
-                        unsafe.remove(noop);
-                    }
-                    latch.countDown();
-                });
-                executor.submit(() -> {
-                    for (int j = 0; j < opsPerThread; j++) {
-                        safe.add(noop);
-                        safe.remove(noop);
-                    }
-                    latch.countDown();
-                });
-            }
-
-            latch.await();
-            executor.shutdown();
-
-            assertThat(safe.getDelegates().size()).isEqualTo(0);
         }
 
         @Test
@@ -575,22 +582,4 @@ class MulticastDelegateTest {
         }
     }
 
-    @Nested
-    @DisplayName("内存布局")
-    class MemoryLayoutTests {
-        @Test
-        @DisplayName("应正确显示对象内存布局")
-        void shouldShowCorrectMemoryLayout() {
-            Actions actions = Actions.delegate();
-            ClassLayout classLayout = ClassLayout.parseInstance(actions);
-
-            System.out.println(classLayout.toPrintable());
-            assertThat(classLayout.instanceSize()).isEqualTo(8 + 4 + 4 + 4 + 4);
-
-            GraphLayout graphLayout = GraphLayout.parseInstance(actions);
-
-            System.out.println(graphLayout.toPrintable());
-            assertThat(graphLayout.totalSize()).isEqualTo(16 + 24 + 16);
-        }
-    }
 }

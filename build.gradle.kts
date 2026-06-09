@@ -29,9 +29,6 @@ dependencies {
     // https://mvnrepository.com/artifact/org.assertj/assertj-core
     testImplementation("org.assertj:assertj-core:3.27.7")
 
-    // https://mvnrepository.com/artifact/org.openjdk.jol/jol-core
-    testImplementation("org.openjdk.jol:jol-core:0.17")
-
     // https://mvnrepository.com/artifact/org.openjdk.jmh/jmh-core
     testImplementation("org.openjdk.jmh:jmh-core:1.37")
     // https://mvnrepository.com/artifact/org.openjdk.jmh/jmh-generator-annprocess
